@@ -8,9 +8,14 @@ import java.util.regex.Pattern;
 
 class MarkdownSlides {
     private static final Pattern HEADING = Pattern.compile("^(#{1,6})\\s+(.*)$");
-    private static final Pattern IMAGE_ONLY = Pattern.compile("^!\\[([^\\]]*)\\]\\(([^)]+)\\)\\s*$");
+    private static final Pattern SETEXT_HEADING = Pattern.compile("^\\s*(=+|-+)\\s*$");
+    private static final Pattern IMAGE_ONLY = Pattern.compile("^!\\[([^\\]]*)\\]\\((.+)\\)\\s*$");
     private static final Pattern NOTES = Pattern.compile("^\\s*<!--\\s*speaker-notes(?::|\\s)(.*?)-->\\s*$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern LINK = Pattern.compile("\\[([^\\]]+)\\]\\(([^)]+)\\)");
+    private static final Pattern NOTES_START = Pattern.compile("^\\s*<!--\\s*speaker-notes(?::|\\s)(.*)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LINK = Pattern.compile("\\[([^\\]]+)\\]\\((.+?)\\)");
+    private static final Pattern LIST_ITEM = Pattern.compile("^(\\s*)(?:[-+*]|\\d+[.)])\\s+(.*)$");
+    private static final Pattern BLOCKQUOTE = Pattern.compile("^\\s*>\\s?(.*)$");
+    private static final Pattern THEMATIC_BREAK = Pattern.compile("^\\s{0,3}([-*_])(?:\\s*\\1){2,}\\s*$");
 
     List<SlideModel> parse(String markdown, Md2PptxOptions options) {
         List<SlideModel> slides = new ArrayList<SlideModel>();
@@ -27,18 +32,58 @@ class MarkdownSlides {
                 continue;
             }
 
+            if (isSetextHeading(lines, index)) {
+                current = new SlideModel(normalizeLine(stripInlineMarkdown(lines[index])));
+                slides.add(current);
+                index += 2;
+                continue;
+            }
+
             Matcher notes = NOTES.matcher(line);
             if (notes.matches()) {
                 current = ensureSlide(slides, current, options);
-                String value = notes.group(1).trim();
-                if (!value.isEmpty()) {
-                    current.notes.add(Arrays.asList(new TextRun(value)));
-                }
+                addNotes(current, notes.group(1));
                 index++;
                 continue;
             }
 
+            Matcher notesStart = NOTES_START.matcher(line);
+            if (notesStart.matches()) {
+                current = ensureSlide(slides, current, options);
+                StringBuilder noteText = new StringBuilder();
+                String firstLine = notesStart.group(1);
+                int end = firstLine.indexOf("-->");
+                if (end >= 0) {
+                    noteText.append(firstLine.substring(0, end));
+                    index++;
+                } else {
+                    noteText.append(firstLine);
+                    index++;
+                    while (index < lines.length) {
+                        String noteLine = lines[index];
+                        int close = noteLine.indexOf("-->");
+                        if (close >= 0) {
+                            noteText.append('\n').append(noteLine.substring(0, close));
+                            index++;
+                            break;
+                        }
+                        noteText.append('\n').append(noteLine);
+                        index++;
+                    }
+                }
+                addNotes(current, noteText.toString());
+                continue;
+            }
+
             if (line.trim().isEmpty()) {
+                index++;
+                continue;
+            }
+
+            Matcher thematicBreak = THEMATIC_BREAK.matcher(line);
+            if (thematicBreak.matches()) {
+                current = ensureSlide(slides, current, options);
+                current.blocks.add(SlideBlock.text(Arrays.asList(new TextRun("---"))));
                 index++;
                 continue;
             }
@@ -59,8 +104,43 @@ class MarkdownSlides {
             Matcher image = IMAGE_ONLY.matcher(line.trim());
             if (image.matches()) {
                 current = ensureSlide(slides, current, options);
-                current.blocks.add(SlideBlock.image(image.group(1), image.group(2)));
+                String imageUrl = extractLinkTarget(image.group(2));
+                current.blocks.add(SlideBlock.image(image.group(1), imageUrl));
                 index++;
+                continue;
+            }
+
+            Matcher listItem = LIST_ITEM.matcher(line);
+            if (listItem.matches()) {
+                current = ensureSlide(slides, current, options);
+                while (index < lines.length) {
+                    Matcher item = LIST_ITEM.matcher(lines[index]);
+                    if (!item.matches()) {
+                        break;
+                    }
+                    StringBuilder itemText = new StringBuilder(item.group(2));
+                    int currentIndent = listIndent(item.group(1));
+                    index++;
+                    while (index < lines.length && isListContinuation(lines[index], currentIndent)) {
+                        itemText.append(' ').append(lines[index].trim());
+                        index++;
+                    }
+                    current.blocks.add(SlideBlock.text(prefixedRuns(listPrefix(item.group(1)), itemText.toString())));
+                }
+                continue;
+            }
+
+            Matcher blockquote = BLOCKQUOTE.matcher(line);
+            if (blockquote.matches()) {
+                current = ensureSlide(slides, current, options);
+                while (index < lines.length) {
+                    Matcher quote = BLOCKQUOTE.matcher(lines[index]);
+                    if (!quote.matches()) {
+                        break;
+                    }
+                    current.blocks.add(SlideBlock.text(prefixedRuns("> ", quote.group(1))));
+                    index++;
+                }
                 continue;
             }
 
@@ -83,7 +163,11 @@ class MarkdownSlides {
             while (index < lines.length && !lines[index].trim().isEmpty()
                     && !HEADING.matcher(lines[index]).matches()
                     && !isTableStart(lines, index)
-                    && !NOTES.matcher(lines[index]).matches()) {
+                    && !LIST_ITEM.matcher(lines[index]).matches()
+                    && !BLOCKQUOTE.matcher(lines[index]).matches()
+                    && !THEMATIC_BREAK.matcher(lines[index]).matches()
+                    && !NOTES.matcher(lines[index]).matches()
+                    && !NOTES_START.matcher(lines[index]).matches()) {
                 paragraph.append(' ').append(lines[index].trim());
                 index++;
             }
@@ -140,7 +224,12 @@ class MarkdownSlides {
             if (matcher.start() > offset) {
                 runs.add(new TextRun(stripInlineMarkdown(markdownText.substring(offset, matcher.start()))));
             }
-            runs.add(new TextRun(stripInlineMarkdown(matcher.group(1)), matcher.group(2)));
+            String target = extractLinkTarget(matcher.group(2));
+            if (!target.isEmpty()) {
+                runs.add(new TextRun(stripInlineMarkdown(matcher.group(1)), target));
+            } else {
+                runs.add(new TextRun(stripInlineMarkdown(matcher.group(1))));
+            }
             offset = matcher.end();
         }
         if (offset < markdownText.length()) {
@@ -156,11 +245,130 @@ class MarkdownSlides {
         return normalized;
     }
 
+    private List<TextRun> prefixedRuns(String prefix, String markdownText) {
+        List<TextRun> runs = new ArrayList<TextRun>();
+        runs.add(new TextRun(prefix));
+        runs.addAll(textRuns(markdownText));
+        return runs;
+    }
+
+    private int listIndent(String indent) {
+        if (indent == null) {
+            return 0;
+        }
+        return indent.replace("\t", "  ").length();
+    }
+
+    private int lineIndent(String line) {
+        int spaces = 0;
+        for (int index = 0; index < line.length(); index++) {
+            char current = line.charAt(index);
+            if (current == ' ') {
+                spaces++;
+            } else if (current == '\t') {
+                spaces += 2;
+            } else {
+                break;
+            }
+        }
+        return spaces;
+    }
+
+    private boolean isListContinuation(String line, int listIndent) {
+        if (line == null || line.trim().isEmpty()) {
+            return false;
+        }
+        Matcher nested = LIST_ITEM.matcher(line);
+        if (nested.matches()) {
+            return false;
+        }
+        return lineIndent(line) > listIndent;
+    }
+
+    private boolean isSetextHeading(String[] lines, int index) {
+        if (index + 1 >= lines.length) {
+            return false;
+        }
+        if (lines[index].trim().isEmpty() || HEADING.matcher(lines[index]).matches()) {
+            return false;
+        }
+        return SETEXT_HEADING.matcher(lines[index + 1]).matches();
+    }
+
+    private String listPrefix(String indent) {
+        int depth = listIndent(indent) / 2;
+        StringBuilder prefix = new StringBuilder();
+        for (int index = 0; index < depth; index++) {
+            prefix.append("  ");
+        }
+        prefix.append("- ");
+        return prefix.toString();
+    }
+
     private String stripInlineMarkdown(String value) {
-        return value == null ? "" : value.replace("**", "").replace("__", "").replace("`", "");
+        if (value == null) {
+            return "";
+        }
+        return value.replaceAll("\\*\\*([^*]+)\\*\\*", "$1")
+                .replaceAll("__([^_]+)__", "$1")
+                .replaceAll("~~([^~]+)~~", "$1")
+                .replaceAll("`([^`]+)`", "$1")
+                .replaceAll("(?<!\\w)\\*([^*]+)\\*(?!\\w)", "$1")
+                .replaceAll("(?<!\\w)_([^_]+)_(?!\\w)", "$1");
     }
 
     private String normalizeLine(String value) {
         return value == null ? "" : value.replaceAll("\\s+", " ").trim();
+    }
+
+    private void addNotes(SlideModel slide, String value) {
+        if (value == null) {
+            return;
+        }
+        String[] noteLines = value.split("\\r?\\n", -1);
+        for (String noteLine : noteLines) {
+            String text = normalizeLine(noteLine);
+            if (!text.isEmpty()) {
+                slide.notes.add(Arrays.asList(new TextRun(text)));
+            }
+        }
+    }
+
+    private String extractLinkTarget(String rawTarget) {
+        if (rawTarget == null) {
+            return "";
+        }
+        String target = rawTarget.trim();
+        if (target.startsWith("<") && target.indexOf(">") >= 0) {
+            target = target.substring(1, target.indexOf(">"));
+        }
+        int separator = firstUnquotedWhitespace(target);
+        if (separator >= 0) {
+            target = target.substring(0, separator);
+        }
+        if (target.length() >= 2) {
+            char start = target.charAt(0);
+            char end = target.charAt(target.length() - 1);
+            if ((start == '"' && end == '"') || (start == '\'' && end == '\'')) {
+                target = target.substring(1, target.length() - 1);
+            }
+        }
+        return target.trim();
+    }
+
+    private int firstUnquotedWhitespace(String value) {
+        boolean inSingleQuote = false;
+        boolean inDoubleQuote = false;
+        for (int index = 0; index < value.length(); index++) {
+            char current = value.charAt(index);
+            if (current == '\'') {
+                inSingleQuote = !inSingleQuote;
+            } else if (current == '"') {
+                inDoubleQuote = !inDoubleQuote;
+            } else if (Character.isWhitespace(current) && !inSingleQuote && !inDoubleQuote) {
+                return index;
+            }
+        }
+        return -1;
     }
 }

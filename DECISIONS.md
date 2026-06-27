@@ -48,3 +48,19 @@ Impact:
 Adopt the Maven/CLI/runtime shape from the sister Java repositories, but keep
 shared miku-soft reference files out of this repository and link to the skill
 through `docs/miku-soft-reference.md`.
+
+## 2026-06-28: Incremental Parser Parity
+
+Reason:
+The current goal is practical Node.js feature and behavior parity, but replacing
+the Java parser wholesale would be larger than the next useful compatibility
+step. Upstream `slide-model.ts` has clear behavior for list blocks,
+blockquotes, and thematic breaks that can be matched within the existing Java
+1.8 line-based parser.
+
+Impact:
+Extend `MarkdownSlides` incrementally for concrete upstream slide-model
+behaviors such as block normalization, inline marker text normalization, and
+speaker notes handling. Add focused tests and mapping docs for each closed gap,
+and keep the remaining `remark-gfm` parity gaps documented until a broader
+parser change is justified.

@@ -8,13 +8,20 @@
 - Core API for converting Markdown text to `.pptx` bytes.
 - PPTX package generation for slides, basic text, links, tables, images, and
   speaker notes.
+- GFM-style list, blockquote, and thematic break block normalization aligned
+  with upstream slide model behavior.
+- Inline marker stripping for common emphasis, delete, and code markers, plus
+  multiline speaker notes comments.
+- Setext heading handling and indented list continuation behavior aligned with
+  upstream markdown semantics.
 - Focused JUnit tests for core and CLI basics.
 
 ## Pending Compatibility Work
 
 - Replace or extend the first-cut Markdown parser to better match upstream
   `remark-gfm` behavior.
-- Expand inline Markdown support beyond simple links and marker stripping.
+- Continue closing parser gaps not covered by the current line-based Java
+  implementation, especially more complex nested Markdown AST cases.
 - Add parity fixtures shared with upstream `miku-md2pptx` and reverse checks
   through `miku-pptx2md` where practical.
 - Check generated decks in Microsoft PowerPoint or LibreOffice for repair-free

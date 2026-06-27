@@ -29,6 +29,107 @@ class MikuMd2pptxCoreTest {
     }
 
     @Test
+    void normalizesSetextHeadingsAtLevelOneAndTwoLikeUpstream() {
+        List<SlideModel> slides = new MikuMd2pptxCore().markdownToSlides(
+                "Deck summary\n=====\n\nIntro line.\n\nNumbers\n---\n\n- Item\n", new Md2PptxOptions());
+
+        assertEquals(2, slides.size());
+        assertEquals("Deck summary", slides.get(0).title);
+        assertEquals("Intro line.", slides.get(0).blocks.get(0).text);
+        assertEquals("Numbers", slides.get(1).title);
+        assertEquals("- Item", slides.get(1).blocks.get(0).text);
+    }
+
+    @Test
+    void normalizesGfmListBlockquoteAndThematicBreakBlocksLikeUpstream() {
+        List<SlideModel> slides = new MikuMd2pptxCore().markdownToSlides(
+                "# Deck\n\n1. First\n  - Child\n\n> Quoted **text**\n\n---\n", new Md2PptxOptions());
+
+        assertEquals(1, slides.size());
+        assertEquals("- First", slides.get(0).blocks.get(0).text);
+        assertEquals("  - Child", slides.get(0).blocks.get(1).text);
+        assertEquals("> Quoted text", slides.get(0).blocks.get(2).text);
+        assertEquals("---", slides.get(0).blocks.get(3).text);
+    }
+
+    @Test
+    void mergesIndentedListContinuationLinesLikeUpstream() {
+        List<SlideModel> slides = new MikuMd2pptxCore().markdownToSlides(
+                "- First item\n  continued text\n  - Nested item\n- Next\n", new Md2PptxOptions());
+
+        assertEquals(1, slides.size());
+        assertEquals("- First item continued text", slides.get(0).blocks.get(0).text);
+        assertEquals("  - Nested item", slides.get(0).blocks.get(1).text);
+        assertEquals("- Next", slides.get(0).blocks.get(2).text);
+    }
+
+    @Test
+    void normalizesInlineMarkersAndMultilineSpeakerNotesLikeUpstream() throws Exception {
+        Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx(
+                "# *Deck*\n\nBody with *emphasis*, _alt_, ~~delete~~, and `code`.\n\n"
+                        + "Keep snake_case text.\n\n"
+                        + "<!-- speaker-notes:\n"
+                        + "First note\n"
+                        + "Second note\n"
+                        + "-->");
+        Map<String, byte[]> entries = ZipTestSupport.unzip(result.getPptx());
+        String slide = ZipTestSupport.text(entries, "ppt/slides/slide1.xml");
+        String notes = ZipTestSupport.text(entries, "ppt/notesSlides/notesSlide1.xml");
+
+        assertTrue(slide.contains("<a:t>Deck</a:t>"));
+        assertTrue(slide.contains("<a:t>Body with emphasis, alt, delete, and code.</a:t>"));
+        assertTrue(slide.contains("<a:t>Keep snake_case text.</a:t>"));
+        assertTrue(notes.contains("<a:t>First note</a:t>"));
+        assertTrue(notes.contains("<a:t>Second note</a:t>"));
+    }
+
+    @Test
+    void preservesLinksAndImagesWithMarkdownTitleSyntax() throws Exception {
+        Md2PptxOptions options = new Md2PptxOptions();
+        options.setImageLoader(new Md2PptxOptions.ImageLoader() {
+            @Override
+            public ImageAsset load(String path) {
+                if ("assets/chart.png".equals(path)) {
+                    return new ImageAsset(ONE_PIXEL_PNG, "png");
+                }
+                return null;
+            }
+        });
+        Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx(
+                "# Deck\n\nSee [Example](https://example.com \"external\").\n\n![Chart](assets/chart.png \"logo\")",
+                options);
+        Map<String, byte[]> entries = ZipTestSupport.unzip(result.getPptx());
+
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/slide1.xml").contains("<a:hlinkClick"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/_rels/slide1.xml.rels").contains("https://example.com"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/slide1.xml").contains("p:pic"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/_rels/slide1.xml.rels").contains("media/image1.png"));
+    }
+
+    @Test
+    void stripsQuotedLinkAndImageUrlsBeforeProcessing() throws Exception {
+        Md2PptxOptions options = new Md2PptxOptions();
+        options.setImageLoader(new Md2PptxOptions.ImageLoader() {
+            @Override
+            public ImageAsset load(String path) {
+                if ("assets/chart.png".equals(path)) {
+                    return new ImageAsset(ONE_PIXEL_PNG, "png");
+                }
+                return null;
+            }
+        });
+        Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx(
+                "# Deck\n\nSee [Example](\"https://example.com\" \"external\").\n\n![Chart]('assets/chart.png' \"logo\")",
+                options);
+        Map<String, byte[]> entries = ZipTestSupport.unzip(result.getPptx());
+
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/slide1.xml").contains("<a:hlinkClick"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/_rels/slide1.xml.rels").contains("https://example.com"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/slide1.xml").contains("p:pic"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/_rels/slide1.xml.rels").contains("media/image1.png"));
+    }
+
+    @Test
     void createsPptxPackageWithPresentationAndSlideParts() throws Exception {
         Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx("# Deck\n\n## Slide\n\nBody");
         Map<String, byte[]> entries = ZipTestSupport.unzip(result.getPptx());

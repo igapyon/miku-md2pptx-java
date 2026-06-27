@@ -17,26 +17,44 @@ Read this before starting work, before deciding that work is complete, and whene
 
 ## Objective
 
-Create the initial Java companion version of `miku-md2pptx` in this repository,
-following `igapyon-miku-soft-developer` Java straight-conversion guidance.
+Node版相当(実質的に Node.js 版相当)に至ることを目標として、`miku-md2pptx-java`
+を `miku-md2pptx` の実装と比較しながら実用レベルの機能・振る舞い同等性へ近づける。
+
+Bring `miku-md2pptx-java` to practical feature and behavior parity with the
+Node.js `miku-md2pptx` main application, following
+`igapyon-miku-soft-developer` Java straight-conversion guidance.
 
 The target repository is `miku-md2pptx-java`. The upstream source is the local
 and GitHub `miku-md2pptx` main application. Same-layer sister references are
 `miku-md2xlsx-java` and `miku-md2docx-java`.
 
+The initial Java companion skeleton already exists. The current goal is to
+close the remaining compatibility gap until the Java CLI/runtime can be treated
+as the Java-side equivalent of the Node.js version for normal supported use.
+
 ## Done
 
-- The repository has the expected miku-soft Java companion skeleton:
-  Maven build, Java 1.8 settings, CLI entrypoint, core package, docs,
-  `README.md`, `TODO.md`, `DECISIONS.md`, `HANDOFF.md`, `.gitignore`,
-  `.mvn/jvm.config`, and `workplace/.gitkeep`.
-- The Java runtime can convert a small Markdown file to a `.pptx` package.
-- CLI behavior covers at least `--help`, `--version`, `<input.md> --out <output.pptx>`,
-  and optional `--title`.
-- Focused tests cover slide splitting, PPTX package entries, tables, links,
-  images or skipped-image diagnostics, speaker notes where implemented, and CLI basics.
+- Supported Markdown and PPTX output behavior is mapped against the Node.js
+  `miku-md2pptx` upstream, with unsupported or intentionally different behavior
+  documented explicitly.
+- The Java Markdown parsing and conversion behavior covers the practical
+  upstream feature set, including slide splitting, paragraphs, lists, code
+  blocks, tables, links, images, speaker notes, diagnostics, and metadata/title
+  handling where supported by the Node.js version.
+- CLI behavior and exit behavior are equivalent to the Node.js version for
+  supported options and common failure cases, including `--help`, `--version`,
+  input/output handling, overwrite behavior, and diagnostics.
+- Generated `.pptx` files are structurally valid and open without repair in
+  PowerPoint or LibreOffice for representative upstream-compatible fixtures.
+- Compatibility tests or golden fixture checks compare Java output expectations
+  against upstream behavior where practical, and focused regression tests cover
+  every supported feature.
+- Public docs describe Java usage, compatibility status, known differences, and
+  remaining limitations without overstating parity.
 - `mvn test` passes, or any verification blocker is recorded in `TODO.md` and
   summarized in `HANDOFF.md`.
+- `mvn package` passes and the packaged CLI is smoke-tested on representative
+  Markdown input.
 - Final `git status --short` and diff are reviewed for unintended changes.
 
 ## Stop
@@ -44,6 +62,8 @@ and GitHub `miku-md2pptx` main application. Same-layer sister references are
 - Upstream `miku-md2pptx` behavior needed for compatibility is unclear enough
   that implementation would become guesswork.
 - Sister reference differences conflict and require a human decision.
+- Exact Node.js parity requires a dependency, file format behavior, or runtime
+  assumption that is unsuitable for the Java 1.8 companion boundary.
 - Build or test dependency resolution repeatedly fails for the same underlying
   cause.
 - `TODO.md` の `Retry Log` に同じ原因の失敗が3回記録された。

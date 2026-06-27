@@ -17,18 +17,32 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Current State
 
+- The active goal is now practical feature and behavior parity with the Node.js
+  `miku-md2pptx` main application.
 - Initial creation of `miku-md2pptx-java` is implemented locally.
 - The repository now has Maven runtime/CLI skeleton, Java core conversion,
   focused tests, README, miku-soft reference docs, upstream mapping docs, and
   AI state files.
-- Current files are still untracked because this repository started from
-  `LICENSE` only.
+- Java parser parity now includes upstream-style GFM list, blockquote, and
+  thematic break slide blocks, common inline marker stripping, and multiline
+  speaker notes comments.
+- Java parser parity now also handles setext-style headings and indented list
+  continuation lines, matching additional upstream markdown behaviors.
+- Link/image URL parsing now preserves destinations with title/quote variants
+  before hyperlink and image handling.
+- CLI parser behavior now has explicit tests for unknown options and missing
+  required values/arguments.
 
 ## Next Action
 
-- Review final diff/status, then decide whether to commit.
-- For product hardening, continue with parser parity and manual PowerPoint
-  repair-free checks listed in `docs/remaining-migration-items.md`.
+- Continue parser parity beyond the current line-based implementation, then add
+  broader fixture or golden checks against upstream behavior.
+- Run the focused parser and CLI tests now expanded in `docs/upstream-test-mapping.md`
+  and continue parity work for remaining complex nested markdown cases.
+- Perform manual PowerPoint or LibreOffice repair-free checks listed in
+  `docs/remaining-migration-items.md`.
+- Perform manual PowerPoint or LibreOffice repair-free checks listed in
+  `docs/remaining-migration-items.md`.
 
 ## Relevant Files
 
@@ -56,8 +70,8 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Last Verification
 
-- `mvn package`: success, 11 tests passed, jar and dist zip created.
+- `mvn test`: success, 21 tests passed after adding CLI failure-path coverage.
+- `mvn package`: success, 21 tests passed, jar and dist zip created.
 - `java -jar target/miku-md2pptx-java-0.2.2.jar --version`: printed `0.2.2`.
 - `java -jar target/miku-md2pptx-java-0.2.2.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke`: success.
 - `jar tf target/smoke.pptx`: confirmed presentation, slide, notes, theme, and relationship parts.
-- `mvn test`: success, 11 tests passed.

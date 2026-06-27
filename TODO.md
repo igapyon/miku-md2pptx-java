@@ -33,6 +33,18 @@ Update this section while working. Do not rewrite unrelated TODO items.
 - [x] Add README and miku-soft/upstream mapping docs.
 - [x] Run `mvn test` and fix failures.
 - [x] Review `git diff` and `git status --short`.
+- [x] Retarget `GOAL.md` from initial companion creation to practical Node.js
+  feature and behavior parity.
+- [x] Add Java parser parity for upstream-style GFM list, blockquote, and
+  thematic break slide blocks.
+- [x] Add focused test mapping for the new parser parity coverage.
+- [x] Add Java parser parity for common inline marker stripping and multiline
+  speaker notes comments.
+- [x] Handle Markdown link and image URL title/quote variants (for quoted and
+  angled URLs).
+- [x] Add CLI parser failure-path coverage for unknown options and missing required
+  arguments.
+- [x] Add parser parity for setext headings and indented list continuation lines.
 
 ### Blockers
 
@@ -47,7 +59,8 @@ If the same failure appears 3 times, stop and ask the user.
 
 ## Project Follow-up
 
-- Improve Java Markdown parsing parity with upstream `remark-gfm`.
+- Continue improving Java Markdown parsing parity with upstream `remark-gfm`
+  beyond the current block, inline marker, and multiline speaker notes coverage.
 - Add reverse compatibility checks through `miku-pptx2md` where practical.
 - Perform manual PowerPoint or LibreOffice repair-free opening checks on
   representative generated decks.

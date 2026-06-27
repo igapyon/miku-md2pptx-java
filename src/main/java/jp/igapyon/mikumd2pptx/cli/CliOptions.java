@@ -34,7 +34,7 @@ class CliOptions {
 
     private static String requireValue(String[] args, int index, String option) {
         if (index >= args.length || args[index].startsWith("--")) {
-            throw new IllegalArgumentException("Missing value for " + option);
+            throw new IllegalArgumentException(option + " requires a value.");
         }
         return args[index];
     }

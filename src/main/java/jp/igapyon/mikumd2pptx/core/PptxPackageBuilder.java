@@ -1,17 +1,20 @@
 package jp.igapyon.mikumd2pptx.core;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import jp.igapyon.mikumsofficecore.OpcContentTypeDefault;
+import jp.igapyon.mikumsofficecore.OpcContentTypeOverride;
+import jp.igapyon.mikumsofficecore.OpcContentTypes;
+import jp.igapyon.mikumsofficecore.OpcRelationship;
+import jp.igapyon.mikumsofficecore.ZipEntryInput;
+import jp.igapyon.mikumsofficecore.ZipPackage;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 class PptxPackageBuilder {
     private final List<Md2PptxDiagnostic> diagnostics;
     private final Md2PptxOptions options;
-    private final List<ZipEntryData> mediaEntries = new ArrayList<ZipEntryData>();
+    private final List<ZipEntryInput> mediaEntries = new ArrayList<ZipEntryInput>();
 
     PptxPackageBuilder(List<Md2PptxDiagnostic> diagnostics, Md2PptxOptions options) {
         this.diagnostics = diagnostics;
@@ -19,7 +22,7 @@ class PptxPackageBuilder {
     }
 
     byte[] build(List<SlideModel> slides) {
-        List<ZipEntryData> entries = new ArrayList<ZipEntryData>();
+        List<ZipEntryInput> entries = new ArrayList<ZipEntryInput>();
         boolean hasNotes = hasNotes(slides);
         entries.add(text("[Content_Types].xml", contentTypes(slides, hasNotes)));
         entries.add(text("_rels/.rels", Ooxml.relsXml(rootRelationships())));
@@ -52,7 +55,7 @@ class PptxPackageBuilder {
             entries.add(text("ppt/tableStyles.xml", PptxStaticParts.tableStylesXml()));
         }
         entries.addAll(mediaEntries);
-        return zip(entries);
+        return ZipPackage.writeZipPackage(entries);
     }
 
     private boolean hasNotes(List<SlideModel> slides) {
@@ -64,34 +67,34 @@ class PptxPackageBuilder {
         return false;
     }
 
-    private ZipEntryData text(String path, String value) {
-        return new ZipEntryData(path, value.getBytes(StandardCharsets.UTF_8));
+    private ZipEntryInput text(String path, String value) {
+        return new ZipEntryInput(path, value.getBytes(StandardCharsets.UTF_8));
     }
 
-    private List<SlideRelationship> rootRelationships() {
-        List<SlideRelationship> rels = new ArrayList<SlideRelationship>();
-        rels.add(new SlideRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument", "ppt/presentation.xml"));
-        rels.add(new SlideRelationship("rId2", "http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties", "docProps/core.xml"));
-        rels.add(new SlideRelationship("rId3", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties", "docProps/app.xml"));
+    private List<OpcRelationship> rootRelationships() {
+        List<OpcRelationship> rels = new ArrayList<OpcRelationship>();
+        rels.add(new OpcRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument", "ppt/presentation.xml"));
+        rels.add(new OpcRelationship("rId2", "http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties", "docProps/core.xml"));
+        rels.add(new OpcRelationship("rId3", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties", "docProps/app.xml"));
         return rels;
     }
 
-    private List<SlideRelationship> slideMasterRelationships() {
-        List<SlideRelationship> rels = new ArrayList<SlideRelationship>();
-        rels.add(new SlideRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout", "../slideLayouts/slideLayout1.xml"));
-        rels.add(new SlideRelationship("rId2", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme", "../theme/theme1.xml"));
+    private List<OpcRelationship> slideMasterRelationships() {
+        List<OpcRelationship> rels = new ArrayList<OpcRelationship>();
+        rels.add(new OpcRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout", "../slideLayouts/slideLayout1.xml"));
+        rels.add(new OpcRelationship("rId2", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme", "../theme/theme1.xml"));
         return rels;
     }
 
-    private List<SlideRelationship> slideLayoutRelationships() {
-        List<SlideRelationship> rels = new ArrayList<SlideRelationship>();
-        rels.add(new SlideRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster", "../slideMasters/slideMaster1.xml"));
+    private List<OpcRelationship> slideLayoutRelationships() {
+        List<OpcRelationship> rels = new ArrayList<OpcRelationship>();
+        rels.add(new OpcRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster", "../slideMasters/slideMaster1.xml"));
         return rels;
     }
 
-    private List<SlideRelationship> notesMasterRelationships() {
-        List<SlideRelationship> rels = new ArrayList<SlideRelationship>();
-        rels.add(new SlideRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme", "../theme/theme2.xml"));
+    private List<OpcRelationship> notesMasterRelationships() {
+        List<OpcRelationship> rels = new ArrayList<OpcRelationship>();
+        rels.add(new OpcRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme", "../theme/theme2.xml"));
         return rels;
     }
 
@@ -123,57 +126,59 @@ class PptxPackageBuilder {
     }
 
     private String presentationRelsXml(List<SlideModel> slides, boolean hasNotes) {
-        List<SlideRelationship> rels = new ArrayList<SlideRelationship>();
-        rels.add(new SlideRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster", "slideMasters/slideMaster1.xml"));
+        List<OpcRelationship> rels = new ArrayList<OpcRelationship>();
+        rels.add(new OpcRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideMaster", "slideMasters/slideMaster1.xml"));
         for (int i = 0; i < slides.size(); i++) {
-            rels.add(new SlideRelationship("rId" + (i + 2), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide", "slides/slide" + (i + 1) + ".xml"));
+            rels.add(new OpcRelationship("rId" + (i + 2), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide", "slides/slide" + (i + 1) + ".xml"));
         }
         if (hasNotes) {
             int base = slides.size() + 2;
-            rels.add(new SlideRelationship("rId" + base, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster", "notesMasters/notesMaster1.xml"));
-            rels.add(new SlideRelationship("rId" + (base + 1), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps", "presProps.xml"));
-            rels.add(new SlideRelationship("rId" + (base + 2), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps", "viewProps.xml"));
-            rels.add(new SlideRelationship("rId" + (base + 3), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme", "theme/theme1.xml"));
-            rels.add(new SlideRelationship("rId" + (base + 4), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles", "tableStyles.xml"));
+            rels.add(new OpcRelationship("rId" + base, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster", "notesMasters/notesMaster1.xml"));
+            rels.add(new OpcRelationship("rId" + (base + 1), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps", "presProps.xml"));
+            rels.add(new OpcRelationship("rId" + (base + 2), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/viewProps", "viewProps.xml"));
+            rels.add(new OpcRelationship("rId" + (base + 3), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme", "theme/theme1.xml"));
+            rels.add(new OpcRelationship("rId" + (base + 4), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/tableStyles", "tableStyles.xml"));
         }
         return Ooxml.relsXml(rels);
     }
 
     private String contentTypes(List<SlideModel> slides, boolean hasNotes) {
-        StringBuilder xml = new StringBuilder();
-        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
-        xml.append("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">");
-        xml.append("<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/>");
-        xml.append("<Default Extension=\"xml\" ContentType=\"application/xml\"/>");
-        xml.append("<Default Extension=\"png\" ContentType=\"image/png\"/><Default Extension=\"jpg\" ContentType=\"image/jpeg\"/><Default Extension=\"jpeg\" ContentType=\"image/jpeg\"/><Default Extension=\"gif\" ContentType=\"image/gif\"/>");
-        xml.append("<Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/>");
-        xml.append("<Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/>");
-        xml.append("<Override PartName=\"/ppt/presentation.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml\"/>");
-        xml.append("<Override PartName=\"/ppt/slideMasters/slideMaster1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml\"/>");
-        xml.append("<Override PartName=\"/ppt/slideLayouts/slideLayout1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml\"/>");
-        xml.append("<Override PartName=\"/ppt/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/>");
+        List<OpcContentTypeDefault> defaults = new ArrayList<OpcContentTypeDefault>();
+        defaults.add(new OpcContentTypeDefault("rels", "application/vnd.openxmlformats-package.relationships+xml"));
+        defaults.add(new OpcContentTypeDefault("xml", "application/xml"));
+        defaults.add(new OpcContentTypeDefault("png", "image/png"));
+        defaults.add(new OpcContentTypeDefault("jpg", "image/jpeg"));
+        defaults.add(new OpcContentTypeDefault("jpeg", "image/jpeg"));
+        defaults.add(new OpcContentTypeDefault("gif", "image/gif"));
+
+        List<OpcContentTypeOverride> overrides = new ArrayList<OpcContentTypeOverride>();
+        overrides.add(new OpcContentTypeOverride("docProps/app.xml", "application/vnd.openxmlformats-officedocument.extended-properties+xml"));
+        overrides.add(new OpcContentTypeOverride("docProps/core.xml", "application/vnd.openxmlformats-package.core-properties+xml"));
+        overrides.add(new OpcContentTypeOverride("ppt/presentation.xml", "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"));
+        overrides.add(new OpcContentTypeOverride("ppt/slideMasters/slideMaster1.xml", "application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"));
+        overrides.add(new OpcContentTypeOverride("ppt/slideLayouts/slideLayout1.xml", "application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"));
+        overrides.add(new OpcContentTypeOverride("ppt/theme/theme1.xml", "application/vnd.openxmlformats-officedocument.theme+xml"));
         for (int i = 0; i < slides.size(); i++) {
-            xml.append("<Override PartName=\"/ppt/slides/slide").append(i + 1).append(".xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.slide+xml\"/>");
+            overrides.add(new OpcContentTypeOverride("ppt/slides/slide" + (i + 1) + ".xml", "application/vnd.openxmlformats-officedocument.presentationml.slide+xml"));
             if (!slides.get(i).notes.isEmpty()) {
-                xml.append("<Override PartName=\"/ppt/notesSlides/notesSlide").append(i + 1).append(".xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml\"/>");
+                overrides.add(new OpcContentTypeOverride("ppt/notesSlides/notesSlide" + (i + 1) + ".xml", "application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml"));
             }
         }
         if (hasNotes) {
-            xml.append("<Override PartName=\"/ppt/notesMasters/notesMaster1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml\"/>");
-            xml.append("<Override PartName=\"/ppt/theme/theme2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/>");
-            xml.append("<Override PartName=\"/ppt/presProps.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.presProps+xml\"/>");
-            xml.append("<Override PartName=\"/ppt/viewProps.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml\"/>");
-            xml.append("<Override PartName=\"/ppt/tableStyles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml\"/>");
+            overrides.add(new OpcContentTypeOverride("ppt/notesMasters/notesMaster1.xml", "application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml"));
+            overrides.add(new OpcContentTypeOverride("ppt/theme/theme2.xml", "application/vnd.openxmlformats-officedocument.theme+xml"));
+            overrides.add(new OpcContentTypeOverride("ppt/presProps.xml", "application/vnd.openxmlformats-officedocument.presentationml.presProps+xml"));
+            overrides.add(new OpcContentTypeOverride("ppt/viewProps.xml", "application/vnd.openxmlformats-officedocument.presentationml.viewProps+xml"));
+            overrides.add(new OpcContentTypeOverride("ppt/tableStyles.xml", "application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml"));
         }
-        xml.append("</Types>");
-        return xml.toString();
+        return OpcContentTypes.buildOpcContentTypesXml(new OpcContentTypes(defaults, overrides));
     }
 
     private SlideXmlResult slideXml(SlideModel slide, int index) {
-        List<SlideRelationship> rels = new ArrayList<SlideRelationship>();
-        rels.add(new SlideRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout", "../slideLayouts/slideLayout1.xml"));
+        List<OpcRelationship> rels = new ArrayList<OpcRelationship>();
+        rels.add(new OpcRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout", "../slideLayouts/slideLayout1.xml"));
         if (!slide.notes.isEmpty()) {
-            rels.add(new SlideRelationship("rId" + (rels.size() + 1), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesSlide", "../notesSlides/notesSlide" + index + ".xml"));
+            rels.add(new OpcRelationship("rId" + (rels.size() + 1), "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesSlide", "../notesSlides/notesSlide" + index + ".xml"));
         }
         StringBuilder body = new StringBuilder();
         StringBuilder extras = new StringBuilder();
@@ -205,13 +210,13 @@ class PptxPackageBuilder {
         return new SlideXmlResult(xml, rels);
     }
 
-    private String textParagraph(String text, int index, List<SlideRelationship> relationships) {
+    private String textParagraph(String text, int index, List<OpcRelationship> relationships) {
         List<TextRun> runs = new ArrayList<TextRun>();
         runs.add(new TextRun(text));
         return textParagraphFromRuns(runs, index, relationships);
     }
 
-    private String textParagraphFromRuns(List<TextRun> runs, int index, List<SlideRelationship> relationships) {
+    private String textParagraphFromRuns(List<TextRun> runs, int index, List<OpcRelationship> relationships) {
         ParsedRuns parsed = parseListRuns(runs);
         String pPr = parsed.bullet ? "<a:pPr" + (parsed.level > 0 ? " lvl=\"" + parsed.level + "\"" : "") + "><a:buChar char=\"&#8226;\"/></a:pPr>" : "";
         StringBuilder body = new StringBuilder();
@@ -256,7 +261,7 @@ class PptxPackageBuilder {
         return new ParsedRuns(trimmed, true, Math.min(8, spaces / 2));
     }
 
-    private String textRunXml(TextRun run, int index, List<SlideRelationship> relationships) {
+    private String textRunXml(TextRun run, int index, List<OpcRelationship> relationships) {
         String relId = null;
         if (run.href != null) {
             relId = findOrAddHyperlink(relationships, run.href);
@@ -265,22 +270,22 @@ class PptxPackageBuilder {
         return "<a:r><a:rPr lang=\"en-US\" sz=\"" + (index == 0 ? 2400 : 1800) + "\">" + hyperlink + "</a:rPr><a:t>" + Ooxml.xmlEscape(run.text) + "</a:t></a:r>";
     }
 
-    private String findOrAddHyperlink(List<SlideRelationship> relationships, String href) {
-        for (SlideRelationship rel : relationships) {
-            if (href.equals(rel.target) && rel.type.endsWith("/hyperlink")) {
-                return rel.id;
+    private String findOrAddHyperlink(List<OpcRelationship> relationships, String href) {
+        for (OpcRelationship rel : relationships) {
+            if (href.equals(rel.getTarget()) && rel.getType().endsWith("/hyperlink")) {
+                return rel.getId();
             }
         }
         return addRelationship(relationships, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", href, "External");
     }
 
-    private String addRelationship(List<SlideRelationship> relationships, String type, String target, String targetMode) {
+    private String addRelationship(List<OpcRelationship> relationships, String type, String target, String targetMode) {
         String id = "rId" + (relationships.size() + 1);
-        relationships.add(new SlideRelationship(id, type, target, targetMode));
+        relationships.add(new OpcRelationship(id, type, target, targetMode));
         return id;
     }
 
-    private String tableXml(List<List<TableCell>> rows, int id, List<SlideRelationship> relationships) {
+    private String tableXml(List<List<TableCell>> rows, int id, List<OpcRelationship> relationships) {
         int columnCount = 1;
         for (List<TableCell> row : rows) {
             columnCount = Math.max(columnCount, row.size());
@@ -324,7 +329,7 @@ class PptxPackageBuilder {
         }
         String extension = normalizeImageExtension(asset.getExtension());
         String fileName = "image" + (mediaEntries.size() + 1) + "." + extension;
-        mediaEntries.add(new ZipEntryData("ppt/media/" + fileName, asset.getBytes()));
+        mediaEntries.add(new ZipEntryInput("ppt/media/" + fileName, asset.getBytes()));
         return "../media/" + fileName;
     }
 
@@ -348,7 +353,7 @@ class PptxPackageBuilder {
 
     private String notesXml(SlideModel slide) {
         StringBuilder paragraphs = new StringBuilder();
-        List<SlideRelationship> relationships = new ArrayList<SlideRelationship>();
+        List<OpcRelationship> relationships = new ArrayList<OpcRelationship>();
         int index = 1;
         for (List<TextRun> runs : slide.notes) {
             paragraphs.append(textParagraphFromRuns(runs, index++, relationships));
@@ -359,22 +364,6 @@ class PptxPackageBuilder {
                 + "<p:sp><p:nvSpPr><p:cNvPr id=\"2\" name=\"Slide image placeholder\"/><p:cNvSpPr><a:spLocks noGrp=\"1\" noRot=\"1\" noChangeAspect=\"1\"/></p:cNvSpPr><p:nvPr><p:ph type=\"sldImg\"/></p:nvPr></p:nvSpPr><p:spPr/></p:sp>"
                 + "<p:sp><p:nvSpPr><p:cNvPr id=\"3\" name=\"Notes placeholder\"/><p:cNvSpPr><a:spLocks noGrp=\"1\"/></p:cNvSpPr><p:nvPr><p:ph type=\"body\" idx=\"1\"/></p:nvPr></p:nvSpPr><p:spPr/><p:txBody><a:bodyPr/><a:lstStyle/>"
                 + paragraphs + "</p:txBody></p:sp></p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:notes>";
-    }
-
-    private byte[] zip(List<ZipEntryData> entries) {
-        try {
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            ZipOutputStream zip = new ZipOutputStream(output);
-            for (ZipEntryData entry : entries) {
-                zip.putNextEntry(new ZipEntry(entry.path));
-                zip.write(entry.bytes);
-                zip.closeEntry();
-            }
-            zip.close();
-            return output.toByteArray();
-        } catch (IOException ex) {
-            throw new IllegalStateException("Failed to create pptx package", ex);
-        }
     }
 
     private static class ParsedRuns {
@@ -391,9 +380,9 @@ class PptxPackageBuilder {
 
     private static class SlideXmlResult {
         final String xml;
-        final List<SlideRelationship> relationships;
+        final List<OpcRelationship> relationships;
 
-        SlideXmlResult(String xml, List<SlideRelationship> relationships) {
+        SlideXmlResult(String xml, List<OpcRelationship> relationships) {
             this.xml = xml;
             this.relationships = relationships;
         }

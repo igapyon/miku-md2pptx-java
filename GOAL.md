@@ -32,6 +32,11 @@ The initial Java companion skeleton already exists. The current goal is to
 close the remaining compatibility gap until the Java CLI/runtime can be treated
 as the Java-side equivalent of the Node.js version for normal supported use.
 
+Runtime readiness is part of this goal. The Java repository should not only
+compile locally; it should also provide the release/runtime shape used by the
+sister Java repositories, including reproducible packaged CLI assets and
+documented release operation.
+
 ## Done
 
 - Supported Markdown and PPTX output behavior is mapped against the Node.js
@@ -55,6 +60,16 @@ as the Java-side equivalent of the Node.js version for normal supported use.
   summarized in `HANDOFF.md`.
 - `mvn package` passes and the packaged CLI is smoke-tested on representative
   Markdown input.
+- Runtime release support follows the same-layer sister repository pattern:
+  a GitHub Actions workflow builds the executable jar and sources jar from
+  `v*` tags or manual dispatch, checks tag/POM version compatibility, verifies
+  the generated jar with Java 8 using `--version`, and uploads the runtime
+  assets to the matching GitHub Release.
+- README or developer docs explain the runtime release assets, local dist zip,
+  and the relationship between GitHub Release assets and Maven package outputs.
+- The vendored `miku-ms-office-core-java` jar is treated as a released upstream
+  runtime dependency, with source repository, release tag, filename, and
+  checksum recorded in `vendor/miku-ms-office-core-java/README.md`.
 - Final `git status --short` and diff are reviewed for unintended changes.
 
 ## Stop

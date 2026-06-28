@@ -45,10 +45,77 @@ Update this section while working. Do not rewrite unrelated TODO items.
 - [x] Add CLI parser failure-path coverage for unknown options and missing required
   arguments.
 - [x] Add parser parity for setext headings and indented list continuation lines.
+- [x] Add parser parity for deeper ATX headings as text blocks, closing ATX
+  heading markers, and blank slide heading fallback.
+- [x] Add parser parity for tilde fenced code blocks and indented code blocks.
+- [x] Add parser parity for blank lines inside indented code blocks.
+- [x] Add parser parity for GFM task list marker stripping, Markdown definition
+  line skipping, and reference-style link/image text behavior.
+- [x] Add parser parity for shortcut reference links when a matching definition
+  exists.
+- [x] Add parser parity for shortcut reference images when a matching definition
+  exists.
+- [x] Add parser parity for autolinks, email autolinks, Markdown hard breaks,
+  and escaped table pipes.
+- [x] Add parser parity for GFM bare URL, `www`, and email autolink literals.
+- [x] Add parser parity for ignoring direct inline images inside paragraph text.
+- [x] Add parser parity for nested blockquotes and list blocks inside
+  blockquotes.
+- [x] Add parser parity for Markdown punctuation escapes and common HTML entity
+  decoding in text.
+- [x] Add parser parity for multiple-backtick inline code spans.
+- [x] Add parser parity for blank-line separated paragraphs inside list items.
+- [x] Add parser parity for links nested inside emphasis/delete inline markers.
+- [x] Add parser parity for GFM table delimiter width handling, footnotes, and
+  plain paragraph continuations inside list items.
+- [x] Add upstream smoke fixture mapping coverage and preserve whitespace across
+  adjacent text/link runs.
+- [x] Add parser parity for escaped characters inside inline link labels.
+- [x] Add parser parity for multiline footnote definition continuations.
+- [x] Add parser parity for numeric HTML entity decoding.
+- [x] Add parser parity for parentheses inside Markdown link and image targets.
+- [x] Add parser parity for Markdown formatting, escapes, and entities inside
+  image alt text.
+- [x] Add parser parity for escaped characters inside image labels.
+- [x] Add parser parity for multiline blockquote paragraphs, blockquote list
+  continuations, and blockquote fenced code blocks.
+- [x] Add parser parity for blockquote heading and table child blocks.
+- [x] Add parser parity for list item blockquote and heading child blocks.
+- [x] Add parser parity for list item code, table, and thematic break child
+  blocks.
+- [x] Add parser parity for nested brackets inside inline link/image labels,
+  deeper parentheses inside link/image targets, parentheses inside bare URL
+  autolinks, and additional named HTML entities.
+- [x] Add GitHub Release CLI runtime workflow modeled after
+  `/Users/igapyon/Documents/git/miku-md2docx-java/.github/workflows/release-cli-runtime.yml`
+  and `/Users/igapyon/Documents/git/miku-md2xlsx-java/.github/workflows/release-cli-runtime.yml`.
+- [x] Ensure the release workflow builds with Maven, validates `v*` tag version
+  compatibility against `pom.xml`, uploads the executable jar and sources jar,
+  and verifies the runtime jar with Java 8 using `--version`.
+- [x] Document runtime release assets in `README.md` and/or
+  `docs/development.md`, including the distinction between GitHub Release jar
+  assets and the local Maven assembly dist zip.
+- [x] Add or document a packaged CLI smoke check using
+  `java -jar target/miku-md2pptx-java-0.2.2.jar` on a representative Markdown
+  fixture and verify the generated `.pptx` structure.
+- [x] Add a Java-side reverse compatibility test through
+  local `../miku-pptx2md`, following the upstream Node compatibility test shape
+  when the sister reverse converter checkout is available.
+- [ ] Continue Node parser parity review against
+  `/Users/igapyon/Documents/git/miku-md2pptx/src/ts/slide-model.ts` and
+  `/Users/igapyon/Documents/git/miku-md2pptx/src/ts/markdown-parser.ts`,
+  especially complex `remark-gfm` nested Markdown AST cases.
+- [x] Attempt manual PowerPoint or LibreOffice repair-free opening checks on
+  representative generated decks, or record the blocker if local GUI
+  verification is unavailable.
 
 ### Blockers
 
-- None at the time of writing.
+- Manual PowerPoint/LibreOffice repair-free opening verification is not
+  completed because this local environment does not have `libreoffice`,
+  `soffice`, or `/Applications/LibreOffice.app`. A human should open
+  `target/smoke.pptx` or another representative generated deck in PowerPoint or
+  LibreOffice on a machine with the application installed.
 
 ### Retry Log
 
@@ -60,7 +127,7 @@ If the same failure appears 3 times, stop and ask the user.
 ## Project Follow-up
 
 - Continue improving Java Markdown parsing parity with upstream `remark-gfm`
-  beyond the current block, inline marker, and multiline speaker notes coverage.
-- Add reverse compatibility checks through `miku-pptx2md` where practical.
-- Perform manual PowerPoint or LibreOffice repair-free opening checks on
-  representative generated decks.
+  beyond the current block, heading, code, inline marker, and multiline speaker
+  notes coverage.
+- Complete the manual PowerPoint/LibreOffice repair-free opening check on a
+  machine with PowerPoint or LibreOffice installed.

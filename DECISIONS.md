@@ -64,3 +64,18 @@ behaviors such as block normalization, inline marker text normalization, and
 speaker notes handling. Add focused tests and mapping docs for each closed gap,
 and keep the remaining `remark-gfm` parity gaps documented until a broader
 parser change is justified.
+
+## 2026-06-28: Runtime Release Shape Follows Sister Repositories
+
+Reason:
+The user noted that runtime work is still incomplete. The closest same-layer
+references, `miku-md2docx-java` and `miku-md2xlsx-java`, already define a
+GitHub Release CLI runtime workflow pattern for executable jar and sources jar
+assets.
+
+Impact:
+Add `release-cli-runtime.yml` to `miku-md2pptx-java` using the sister workflow
+shape: build with Maven, validate `v*` tag compatibility with `pom.xml`, verify
+the jar under Java 8 using `--version`, and upload jar assets to the matching
+GitHub Release. Keep the local Maven assembly dist zip as a package output, not
+necessarily as a GitHub Release asset unless a later decision changes that.

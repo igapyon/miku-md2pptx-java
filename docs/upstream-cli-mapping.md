@@ -22,6 +22,8 @@ java -jar target/miku-md2pptx-java-0.2.2.jar --version
 
 ## Differences From Upstream Node CLI
 
+- Help text keeps the upstream wording, but command examples use the executable
+  Java jar instead of `miku-md2pptx` / `npm run cli --`.
 - The upstream CLI resolves input and output paths from its package root.
 - The Java CLI resolves paths from the current process working directory.
 - The Java CLI output path message currently uses an absolute path.

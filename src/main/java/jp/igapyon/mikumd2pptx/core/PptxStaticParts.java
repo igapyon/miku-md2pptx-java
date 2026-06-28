@@ -1,5 +1,7 @@
 package jp.igapyon.mikumd2pptx.core;
 
+import jp.igapyon.mikumsofficecore.OpcRelationship;
+
 class PptxStaticParts {
     static String slideMasterXml() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
@@ -40,9 +42,9 @@ class PptxStaticParts {
     }
 
     static String notesSlideRelsXml(int slideIndex) {
-        java.util.List<SlideRelationship> rels = new java.util.ArrayList<SlideRelationship>();
-        rels.add(new SlideRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster", "../notesMasters/notesMaster1.xml"));
-        rels.add(new SlideRelationship("rId2", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide", "../slides/slide" + slideIndex + ".xml"));
+        java.util.List<OpcRelationship> rels = new java.util.ArrayList<OpcRelationship>();
+        rels.add(new OpcRelationship("rId1", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster", "../notesMasters/notesMaster1.xml"));
+        rels.add(new OpcRelationship("rId2", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide", "../slides/slide" + slideIndex + ".xml"));
         return Ooxml.relsXml(rels);
     }
 

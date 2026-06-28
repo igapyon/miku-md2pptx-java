@@ -11,6 +11,7 @@ This repository is a single-module Maven Java runtime and CLI for
 - Primary verification: `mvn test`
 - Runtime artifact: executable jar
 - Distribution artifact: Maven assembly zip
+- Shared Office package helper: `vendor/miku-ms-office-core-java/`
 
 ## Local Commands
 
@@ -18,12 +19,37 @@ This repository is a single-module Maven Java runtime and CLI for
 mvn test
 mvn package
 java -jar target/miku-md2pptx-java-0.2.2.jar --version
+java -jar target/miku-md2pptx-java-0.2.2.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke
+jar tf target/smoke.pptx
 ```
 
 ## Local Workspace
 
 `workplace/` is local scratch space for temporary outputs, upstream checkouts,
 and sister reference repositories. Git tracks only `workplace/.gitkeep`.
+
+## Vendored Runtime Helper
+
+`vendor/miku-ms-office-core-java/` contains the shared Office core release jar
+used for low-level ZIP / OPC / XML package helpers. PPTX document assembly,
+PowerPoint-specific templates, Markdown conversion semantics, and diagnostics
+remain in this repository.
+
+## Release Assets
+
+GitHub Release runtime assets are produced by
+`.github/workflows/release-cli-runtime.yml`.
+
+The workflow runs for `v*` tags or manual `workflow_dispatch`, builds with
+Maven, checks that the tag version matches `pom.xml` version or a dot-suffixed
+variant, and uploads:
+
+- `miku-md2pptx-java-<version>.jar`
+- `miku-md2pptx-java-sources-<version>.jar`
+
+The executable jar is verified with Java 8 using `--version` before upload. The
+Maven package still builds the local dist zip, but the dist zip is not attached
+to GitHub Releases.
 
 ## Sister References Checked
 

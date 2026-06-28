@@ -32,9 +32,12 @@ class MikuMd2pptxCliTest {
         CliRun run = runCli("--help");
 
         assertEquals(0, run.exitCode);
-        assertTrue(run.out.contains("converts a Markdown file into a PowerPoint .pptx deck"));
+        assertTrue(run.out.startsWith("miku-md2pptx converts a Markdown file into a PowerPoint .pptx deck.\n"));
         assertTrue(run.out.contains("Examples:"));
         assertTrue(run.out.contains("Markdown handling notes:"));
+        assertTrue(run.out.contains("  --version          Show the package version."));
+        assertTrue(run.out.contains("  Paragraphs, lists, code blocks, and tables become simple editable slide text."));
+        assertTrue(run.out.contains("  pixel-perfect PowerPoint layout."));
         assertEquals("", run.err);
     }
 

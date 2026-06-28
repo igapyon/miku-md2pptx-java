@@ -1,5 +1,9 @@
 package jp.igapyon.mikumd2pptx.core;
 
+import jp.igapyon.mikumsofficecore.OpcRelationship;
+import jp.igapyon.mikumsofficecore.OpcRelationships;
+import jp.igapyon.mikumsofficecore.XmlHelper;
+
 import java.util.List;
 
 class Ooxml {
@@ -11,22 +15,10 @@ class Ooxml {
         if (value == null) {
             return "";
         }
-        return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+        return XmlHelper.escapeXmlAttribute(value);
     }
 
-    static String relsXml(List<SlideRelationship> relationships) {
-        StringBuilder xml = new StringBuilder();
-        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
-        xml.append("<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">\n");
-        for (SlideRelationship rel : relationships) {
-            xml.append("  <Relationship Id=\"").append(rel.id).append("\" Type=\"").append(rel.type)
-                    .append("\" Target=\"").append(xmlEscape(rel.target)).append("\"");
-            if (rel.targetMode != null) {
-                xml.append(" TargetMode=\"").append(rel.targetMode).append("\"");
-            }
-            xml.append("/>\n");
-        }
-        xml.append("</Relationships>");
-        return xml.toString();
+    static String relsXml(List<OpcRelationship> relationships) {
+        return OpcRelationships.buildOpcRelationshipsXml(relationships);
     }
 }

@@ -73,11 +73,27 @@ The main Java entrypoints are:
 checkouts, generated verification files, and temporary artifacts. Only
 `workplace/.gitkeep` is tracked.
 
+`vendor/miku-ms-office-core-java/` contains the shared Office core release jar
+used for product-neutral ZIP / OPC / XML package helpers.
+
 Generated Maven outputs under `target/` are ignored.
+
+GitHub Release runtime assets are built by
+`.github/workflows/release-cli-runtime.yml` for `v*` tags or manual workflow
+dispatch. The workflow uploads the executable jar and sources jar. The Maven
+package also creates a local assembly dist zip under `target/`; that zip is a
+local package output rather than a GitHub Release asset.
 
 Developer notes are in [docs/development.md](docs/development.md).
 Shared miku-soft reference information is in
 [docs/miku-soft-reference.md](docs/miku-soft-reference.md).
+
+## AI Agent Notes
+
+Before working in this repository, check [GOAL.md](GOAL.md),
+[TODO.md](TODO.md), [DECISIONS.md](DECISIONS.md), and [HANDOFF.md](HANDOFF.md).
+These files record the current objective, active tasks, decisions, and handoff
+notes for AI agent work.
 
 ## License
 

@@ -81,6 +81,9 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - Nested brackets inside inline link/image labels, deeper parentheses inside
   link/image targets, parentheses inside bare URL autolinks, and additional
   named HTML entities are now normalized like upstream slide-model output.
+- Multiline setext headings are now merged into slide titles like upstream, and
+  blockquote or other block-start lines before thematic breaks are no longer
+  misclassified as setext headings.
 - CLI parser behavior now has explicit tests for unknown options and missing
   required values/arguments.
 - Java `--help` wording now matches the upstream Node CLI text, except for
@@ -135,12 +138,12 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Last Verification
 
-- `mvn test`: success, 49 tests passed after nested label/target and additional
-  named HTML entity parity.
+- `mvn test`: success on 2026-07-02, 51 tests passed after multiline setext
+  heading parity.
 - `mvn package`: success on 2026-06-28, 49 tests passed, jar, sources jar, and
   dist zip created.
-- `java -jar target/miku-md2pptx-java-0.2.2.jar --version`: printed `0.2.2`.
-- `java -jar target/miku-md2pptx-java-0.2.2.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke`: success.
+- `java -jar target/miku-md2pptx-java-0.2.3.jar --version`: printed `0.2.3`.
+- `java -jar target/miku-md2pptx-java-0.2.3.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke`: success.
 - `jar tf target/smoke.pptx`: confirmed presentation, slide, notes, theme, and
   relationship parts.
 - `which libreoffice`, `which soffice`, and `ls -d /Applications/LibreOffice.app`:

@@ -46,20 +46,20 @@ mvn package
 Convert a Markdown file:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.2.2.jar ./sample.md --out ./sample.pptx
+java -jar target/miku-md2pptx-java-0.2.3.jar ./sample.md --out ./sample.pptx
 ```
 
 Override the presentation title:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.2.2.jar ./sample.md --out ./sample.pptx --title "Project brief"
+java -jar target/miku-md2pptx-java-0.2.3.jar ./sample.md --out ./sample.pptx --title "Project brief"
 ```
 
 Show help or version:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.2.2.jar --help
-java -jar target/miku-md2pptx-java-0.2.2.jar --version
+java -jar target/miku-md2pptx-java-0.2.3.jar --help
+java -jar target/miku-md2pptx-java-0.2.3.jar --version
 ```
 
 ## Development Notes
@@ -67,6 +67,7 @@ java -jar target/miku-md2pptx-java-0.2.2.jar --version
 The main Java entrypoints are:
 
 - `jp.igapyon.mikumd2pptx.core.MikuMd2pptxCore`
+- `jp.igapyon.mikumd2pptx.core.MikuMd2pptxMetadata`
 - `jp.igapyon.mikumd2pptx.cli.MikuMd2pptxCli`
 
 `workplace/` is a local scratch area for upstream and sister repository
@@ -83,6 +84,10 @@ GitHub Release runtime assets are built by
 dispatch. The workflow uploads the executable jar and sources jar. The Maven
 package also creates a local assembly dist zip under `target/`; that zip is a
 local package output rather than a GitHub Release asset.
+
+The Java runtime exposes `MikuMd2pptxCore.METADATA` with the same product,
+artifact role, input/output, and core API vocabulary as the upstream Node.js
+runtime metadata.
 
 Developer notes are in [docs/development.md](docs/development.md).
 Shared miku-soft reference information is in

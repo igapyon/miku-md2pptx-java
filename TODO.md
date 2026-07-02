@@ -86,6 +86,8 @@ Update this section while working. Do not rewrite unrelated TODO items.
 - [x] Add parser parity for nested brackets inside inline link/image labels,
   deeper parentheses inside link/image targets, parentheses inside bare URL
   autolinks, and additional named HTML entities.
+- [x] Add parser parity for multiline setext headings and avoid treating block
+  starts before thematic breaks as setext headings.
 - [x] Add GitHub Release CLI runtime workflow modeled after
   `/Users/igapyon/Documents/git/miku-md2docx-java/.github/workflows/release-cli-runtime.yml`
   and `/Users/igapyon/Documents/git/miku-md2xlsx-java/.github/workflows/release-cli-runtime.yml`.
@@ -96,7 +98,7 @@ Update this section while working. Do not rewrite unrelated TODO items.
   `docs/development.md`, including the distinction between GitHub Release jar
   assets and the local Maven assembly dist zip.
 - [x] Add or document a packaged CLI smoke check using
-  `java -jar target/miku-md2pptx-java-0.2.2.jar` on a representative Markdown
+  `java -jar target/miku-md2pptx-java-0.2.3.jar` on a representative Markdown
   fixture and verify the generated `.pptx` structure.
 - [x] Add a Java-side reverse compatibility test through
   local `../miku-pptx2md`, following the upstream Node compatibility test shape

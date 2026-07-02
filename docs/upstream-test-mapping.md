@@ -4,6 +4,7 @@ This file maps upstream test intent to Java tests.
 
 | Upstream test intent | Java test |
 | --- | --- |
+| Export runtime metadata for downstream adapters | `MikuMd2pptxCoreTest.exportsRuntimeMetadataForDownstreamAdaptersLikeUpstream` |
 | Split Markdown into slides at level 1 and 2 headings | `MikuMd2pptxCoreTest.splitsMarkdownIntoSlidesAtLevelOneAndTwoHeadings` |
 | Map upstream `tests/fixtures/smoke.md` to the expected Java slide model | `MikuMd2pptxCoreTest.mapsUpstreamSmokeFixtureToExpectedSlideModel` |
 | Normalize GFM list, blockquote, and thematic break blocks | `MikuMd2pptxCoreTest.normalizesGfmListBlockquoteAndThematicBreakBlocksLikeUpstream` |
@@ -11,6 +12,7 @@ This file maps upstream test intent to Java tests.
 | Merge multiline blockquote paragraphs, blockquote list continuations, blockquote fenced code blocks, heading child blocks, and table child blocks | `MikuMd2pptxCoreTest.mergesBlockquoteParagraphListAndCodeBlocksLikeUpstream` |
 | Normalize inline text markers and multiline speaker notes | `MikuMd2pptxCoreTest.normalizesInlineMarkersAndMultilineSpeakerNotesLikeUpstream` |
 | Parse setext headings as level 1/2 slide headings | `MikuMd2pptxCoreTest.normalizesSetextHeadingsAtLevelOneAndTwoLikeUpstream` |
+| Parse multiline setext headings and avoid treating block starts before thematic breaks as setext headings | `MikuMd2pptxCoreTest.normalizesMultilineSetextHeadingsLikeUpstream`, `MikuMd2pptxCoreTest.doesNotTreatBlockStartsBeforeThematicBreakAsSetextHeadingsLikeUpstream` |
 | Keep level 3-6 ATX headings as text blocks and strip closing heading markers | `MikuMd2pptxCoreTest.keepsDeeperHeadingsAsTextBlocksLikeUpstream` |
 | Use `Untitled slide` for blank level 1/2 headings | `MikuMd2pptxCoreTest.usesUntitledSlideForBlankHeadingLikeUpstream` |
 | Create a `.pptx` package with presentation and slide parts | `MikuMd2pptxCoreTest.createsPptxPackageWithPresentationAndSlideParts` |

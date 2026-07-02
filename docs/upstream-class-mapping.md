@@ -4,7 +4,7 @@ This file maps upstream TypeScript source responsibilities to Java classes.
 
 | Upstream file | Java class or package | Notes |
 | --- | --- | --- |
-| `src/ts/core.ts` | `jp.igapyon.mikumd2pptx.core.MikuMd2pptxCore`, `PptxPackageBuilder` | Public conversion API and PPTX package assembly. |
+| `src/ts/core.ts` | `jp.igapyon.mikumd2pptx.core.MikuMd2pptxCore`, `MikuMd2pptxMetadata`, `PptxPackageBuilder` | Public conversion API, runtime metadata, and PPTX package assembly. |
 | `src/ts/slide-model.ts` | `MarkdownSlides`, `SlideModel`, `SlideBlock`, `TableCell`, `TextRun` | Java first-cut parser is smaller than upstream `remark-gfm` parsing. |
 | `src/ts/types.ts` | `Md2PptxOptions`, `Md2PptxResult`, `Md2PptxDiagnostic`, `ImageAsset` | Java API names follow sister Java repository style. |
 | `src/ts/ooxml.ts` | `Ooxml`, `jp.igapyon.mikumsofficecore.OpcRelationship` | XML escaping and relationship XML. |

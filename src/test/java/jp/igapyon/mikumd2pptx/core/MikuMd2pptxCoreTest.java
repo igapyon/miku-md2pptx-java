@@ -20,6 +20,20 @@ class MikuMd2pptxCoreTest {
     };
 
     @Test
+    void exportsRuntimeMetadataForDownstreamAdaptersLikeUpstream() {
+        MikuMd2pptxMetadata metadata = MikuMd2pptxCore.METADATA;
+
+        assertEquals("miku-md2pptx", metadata.getProductName());
+        assertEquals("markdown-to-pptx-runtime", metadata.getArtifactRole());
+        assertEquals("markdown", metadata.getPrimaryInput());
+        assertEquals("pptx", metadata.getPrimaryOutput());
+        assertEquals(3, metadata.getCoreApi().size());
+        assertEquals("markdownToSlides", metadata.getCoreApi().get(0));
+        assertEquals("markdownToPptx", metadata.getCoreApi().get(1));
+        assertEquals("markdownToPptxResult", metadata.getCoreApi().get(2));
+    }
+
+    @Test
     void splitsMarkdownIntoSlidesAtLevelOneAndTwoHeadings() {
         List<SlideModel> slides = new MikuMd2pptxCore().markdownToSlides("# One\n\nBody\n\n## Two\n\n- Item\n", new Md2PptxOptions());
 
@@ -58,6 +72,26 @@ class MikuMd2pptxCoreTest {
         assertEquals("Intro line.", slides.get(0).blocks.get(0).text);
         assertEquals("Numbers", slides.get(1).title);
         assertEquals("- Item", slides.get(1).blocks.get(0).text);
+    }
+
+    @Test
+    void normalizesMultilineSetextHeadingsLikeUpstream() {
+        List<SlideModel> slides = new MikuMd2pptxCore().markdownToSlides(
+                "Deck summary\ncontinued\n=====\n\nBody\n", new Md2PptxOptions());
+
+        assertEquals(1, slides.size());
+        assertEquals("Deck summary continued", slides.get(0).title);
+        assertEquals("Body", slides.get(0).blocks.get(0).text);
+    }
+
+    @Test
+    void doesNotTreatBlockStartsBeforeThematicBreakAsSetextHeadingsLikeUpstream() {
+        List<SlideModel> slides = new MikuMd2pptxCore().markdownToSlides("> Quote\n---\n", new Md2PptxOptions());
+
+        assertEquals(1, slides.size());
+        assertEquals("Markdown deck", slides.get(0).title);
+        assertEquals("> Quote", slides.get(0).blocks.get(0).text);
+        assertEquals("---", slides.get(0).blocks.get(1).text);
     }
 
     @Test

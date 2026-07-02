@@ -14,6 +14,8 @@
   multiline speaker notes comments.
 - Setext heading handling and indented list continuation behavior aligned with
   upstream markdown semantics.
+- Multiline setext headings are merged into slide titles, and block starts
+  before thematic breaks are no longer mistaken for setext headings.
 - Deeper ATX headings are kept as text blocks, closing ATX markers are stripped,
   and blank level 1/2 headings fall back to `Untitled slide`.
 - Tilde fenced code blocks and indented code blocks are normalized like upstream

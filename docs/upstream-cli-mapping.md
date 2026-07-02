@@ -5,10 +5,10 @@ The Java CLI preserves the first upstream command shape where practical.
 ## Supported
 
 ```bash
-java -jar target/miku-md2pptx-java-0.2.2.jar <input.md> --out <output.pptx>
-java -jar target/miku-md2pptx-java-0.2.2.jar <input.md> --out <output.pptx> --title "Project brief"
-java -jar target/miku-md2pptx-java-0.2.2.jar --help
-java -jar target/miku-md2pptx-java-0.2.2.jar --version
+java -jar target/miku-md2pptx-java-0.2.3.jar <input.md> --out <output.pptx>
+java -jar target/miku-md2pptx-java-0.2.3.jar <input.md> --out <output.pptx> --title "Project brief"
+java -jar target/miku-md2pptx-java-0.2.3.jar --help
+java -jar target/miku-md2pptx-java-0.2.3.jar --version
 ```
 
 ## Behavior

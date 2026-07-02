@@ -59,10 +59,11 @@ class MarkdownSlides {
                 continue;
             }
 
-            if (isSetextHeading(lines, index)) {
-                current = new SlideModel(headingText(lines[index], true));
+            int setextUnderline = setextHeadingUnderlineIndex(lines, index);
+            if (setextUnderline >= 0) {
+                current = new SlideModel(headingText(joinLines(lines, index, setextUnderline), true));
                 slides.add(current);
-                index += 2;
+                index = setextUnderline + 1;
                 continue;
             }
 
@@ -584,14 +585,48 @@ class MarkdownSlides {
         return index;
     }
 
-    private boolean isSetextHeading(String[] lines, int index) {
-        if (index + 1 >= lines.length) {
+    private int setextHeadingUnderlineIndex(String[] lines, int index) {
+        if (index + 1 >= lines.length || !isSetextParagraphLine(lines[index])) {
+            return -1;
+        }
+        int cursor = index + 1;
+        while (cursor < lines.length) {
+            if (SETEXT_HEADING.matcher(lines[cursor]).matches()) {
+                return cursor;
+            }
+            if (!isSetextParagraphLine(lines[cursor])) {
+                return -1;
+            }
+            cursor++;
+        }
+        return -1;
+    }
+
+    private boolean isSetextParagraphLine(String line) {
+        if (line == null || line.trim().isEmpty()) {
             return false;
         }
-        if (lines[index].trim().isEmpty() || HEADING.matcher(lines[index]).matches()) {
-            return false;
+        return !HEADING.matcher(line).matches()
+                && !LIST_ITEM.matcher(line).matches()
+                && !BLOCKQUOTE.matcher(line).matches()
+                && !THEMATIC_BREAK.matcher(line).matches()
+                && !FENCED_CODE.matcher(line).matches()
+                && !FOOTNOTE_DEFINITION.matcher(line).matches()
+                && !DEFINITION.matcher(line).matches()
+                && !NOTES.matcher(line).matches()
+                && !NOTES_START.matcher(line).matches()
+                && !isIndentedCodeLine(line);
+    }
+
+    private String joinLines(String[] lines, int start, int endExclusive) {
+        StringBuilder joined = new StringBuilder();
+        for (int index = start; index < endExclusive; index++) {
+            if (joined.length() > 0) {
+                joined.append(' ');
+            }
+            joined.append(paragraphSegment(lines[index]));
         }
-        return SETEXT_HEADING.matcher(lines[index + 1]).matches();
+        return joined.toString();
     }
 
     private boolean isHardBreakLine(String line) {

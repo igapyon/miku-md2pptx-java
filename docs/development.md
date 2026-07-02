@@ -18,8 +18,8 @@ This repository is a single-module Maven Java runtime and CLI for
 ```bash
 mvn test
 mvn package
-java -jar target/miku-md2pptx-java-0.2.2.jar --version
-java -jar target/miku-md2pptx-java-0.2.2.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke
+java -jar target/miku-md2pptx-java-0.2.3.jar --version
+java -jar target/miku-md2pptx-java-0.2.3.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke
 jar tf target/smoke.pptx
 ```
 
@@ -51,6 +51,11 @@ The executable jar is verified with Java 8 using `--version` before upload. The
 Maven package still builds the local dist zip, but the dist zip is not attached
 to GitHub Releases.
 
+The upstream Node.js release now publishes both CLI and importable runtime
+bundles. The Java counterpart is the executable runtime jar plus sources jar;
+`MikuMd2pptxCore.METADATA` carries the upstream runtime artifact vocabulary for
+downstream adapters.
+
 ## Sister References Checked
 
 - `/Users/igapyon/Documents/git/miku-md2docx-java`
@@ -61,6 +66,7 @@ to GitHub Releases.
 ## miku-soft Reference Check
 
 - Checked date: 2026-06-27
+- Latest upstream follow-up check: 2026-07-02
 - Main workflow: `references/30-java-straight-conversion-workflow.md`
 - Installed skill path:
   `/Users/igapyon/.codex/skills/igapyon-miku-soft-developer`

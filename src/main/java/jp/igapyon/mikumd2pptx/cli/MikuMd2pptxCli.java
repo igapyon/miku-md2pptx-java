@@ -42,14 +42,19 @@ public class MikuMd2pptxCli {
         }
 
         try {
-            Path inputPath = Paths.get(options.inputPath).toAbsolutePath().normalize();
-            Path outputPath = Paths.get(options.outPath).toAbsolutePath().normalize();
+            Path workingDirectory = Paths.get("").toAbsolutePath().normalize();
+            Path inputPath = workingDirectory.resolve(options.inputPath).normalize();
+            Path outputPath = workingDirectory.resolve(options.outPath).normalize();
             String markdown = new String(Files.readAllBytes(inputPath), StandardCharsets.UTF_8);
 
             Md2PptxOptions convertOptions = new Md2PptxOptions();
             convertOptions.setTitle(options.title);
             convertOptions.setSourcePath(inputPath.toString());
             convertOptions.setImageLoader(createImageLoader(inputPath));
+            if (options.templatePath != null) {
+                Path templatePath = workingDirectory.resolve(options.templatePath).normalize();
+                convertOptions.setTemplatePptx(Files.readAllBytes(templatePath));
+            }
 
             Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx(markdown, convertOptions);
             Path parent = outputPath.getParent();
@@ -60,7 +65,13 @@ public class MikuMd2pptxCli {
             for (Md2PptxDiagnostic diagnostic : result.getDiagnostics()) {
                 err.println(diagnostic.getSeverity() + ": " + diagnostic.getCode() + ": " + diagnostic.getMessage());
             }
-            out.println("Wrote " + outputPath);
+            String writtenPath;
+            try {
+                writtenPath = workingDirectory.relativize(outputPath).toString();
+            } catch (IllegalArgumentException ex) {
+                writtenPath = outputPath.toString();
+            }
+            out.println("Wrote " + writtenPath);
             return 0;
         } catch (IOException ex) {
             err.println(ex.getMessage());
@@ -75,24 +86,57 @@ public class MikuMd2pptxCli {
         return "miku-md2pptx converts a Markdown file into a PowerPoint .pptx deck.\n"
                 + "\n"
                 + "Usage:\n"
-                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar <input.md> --out <output.pptx>\n"
+                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar <input.md> --out <output.pptx> [--template <template.pptx>]\n"
                 + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar --help\n"
                 + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar --version\n"
                 + "\n"
                 + "Options:\n"
-                + "  --out <path>       Output .pptx path.\n"
-                + "  --title <text>     Override the generated presentation title.\n"
-                + "  --help             Show this help.\n"
-                + "  --version          Show the package version.\n"
+                + "  --out <path>             Output .pptx path.\n"
+                + "  --template <path>        Use a PowerPoint template's design information and\n"
+                + "                           first title+body slide layout. Existing template\n"
+                + "                           slides are not copied.\n"
+                + "  --title <text>           Override the generated presentation title.\n"
+                + "  --help, -h               Show this help.\n"
+                + "  --version                Show the package version.\n"
+                + "\n"
+                + "Execution contract:\n"
+                + "  Input, output, template, and local image paths are processed locally. Relative\n"
+                + "  CLI paths are resolved from the current working directory.\n"
+                + "  The output parent directory is created when needed. An existing output file\n"
+                + "  is replaced without prompting.\n"
+                + "  On success, the command exits 0 and prints \"Wrote <path>\" to stdout.\n"
+                + "  Conversion diagnostics use \"<severity>: <code>: <message>\" on stderr. A\n"
+                + "  warning does not by itself make the command fail. Fatal errors use stderr and\n"
+                + "  a nonzero exit code.\n"
+                + "\n"
+                + "Template behavior:\n"
+                + "  --template reads slide size, theme, slide masters, slide layouts, and related\n"
+                + "  design parts from the template PPTX.\n"
+                + "  Generated output contains only slides created from the Markdown input.\n"
+                + "  Existing slides in the template are not copied, prepended, appended, or\n"
+                + "  edited.\n"
+                + "  Generated slides reference the first title+body/content layout found in the\n"
+                + "  template. If no such layout is found, the converter tries a title-only layout,\n"
+                + "  then falls back to the built-in generated layout with a diagnostic.\n"
+                + "  If the template PPTX cannot be read, conversion fails instead of silently\n"
+                + "  falling back.\n"
+                + "  Template mode is structural, not pixel-perfect. Tables, images, and dense\n"
+                + "  content may need final positioning in PowerPoint.\n"
                 + "\n"
                 + "Markdown handling notes:\n"
                 + "  Heading level 1 and 2 blocks start new slides.\n"
-                + "  Paragraphs, lists, code blocks, and tables become simple editable slide text.\n"
+                + "  Paragraphs, lists, fenced code blocks, and simple tables become editable\n"
+                + "  PowerPoint content. Markdown links become external hyperlinks.\n"
+                + "  Relative PNG, JPEG, and GIF images under the input file's directory can be\n"
+                + "  embedded. Remote URLs, absolute paths, paths outside that directory, missing\n"
+                + "  files, and unsupported formats are skipped with a warning.\n"
+                + "  <!-- speaker-notes: text --> adds speaker notes to the current slide.\n"
                 + "  The first implementation prioritizes structure and local generation over\n"
                 + "  pixel-perfect PowerPoint layout.\n"
                 + "\n"
                 + "Examples:\n"
                 + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar sample.md --out sample.pptx\n"
+                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar sample.md --out sample.pptx --template template.pptx\n"
                 + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar sample.md --out sample.pptx --title \"Project brief\"\n";
     }
 

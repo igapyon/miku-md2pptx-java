@@ -34,9 +34,14 @@ class MikuMd2pptxCliTest {
         assertEquals(0, run.exitCode);
         assertTrue(run.out.startsWith("miku-md2pptx converts a Markdown file into a PowerPoint .pptx deck.\n"));
         assertTrue(run.out.contains("Examples:"));
+        assertTrue(run.out.contains("Execution contract:"));
+        assertTrue(run.out.contains("replaced without prompting"));
+        assertTrue(run.out.contains("Conversion diagnostics"));
+        assertTrue(run.out.contains("nonzero exit code"));
+        assertTrue(run.out.contains("Tables, images, and dense"));
         assertTrue(run.out.contains("Markdown handling notes:"));
-        assertTrue(run.out.contains("  --version          Show the package version."));
-        assertTrue(run.out.contains("  Paragraphs, lists, code blocks, and tables become simple editable slide text."));
+        assertTrue(run.out.contains("  --version                Show the package version."));
+        assertTrue(run.out.contains("<!-- speaker-notes: text -->"));
         assertTrue(run.out.contains("  pixel-perfect PowerPoint layout."));
         assertEquals("", run.err);
     }
@@ -121,6 +126,24 @@ class MikuMd2pptxCliTest {
         assertEquals(0, run.exitCode);
         assertTrue(run.out.contains("Wrote "));
         assertTrue(run.err.contains("warning: skipped-image: Markdown image was not embedded: assets/missing.png"));
+    }
+
+    @Test
+    void writesPptxUsingTemplateWithoutCopyingTemplateSlides() throws Exception {
+        Path input = tempDir.resolve("input.md");
+        Path template = tempDir.resolve("template.pptx");
+        Path out = tempDir.resolve("out.pptx");
+        Files.write(input, "# Generated\n\nGenerated body\n".getBytes(StandardCharsets.UTF_8));
+        Files.write(template, new MikuMd2pptxCore().convertMarkdownToPptx(
+                "# Template\n\nTemplate-only body").getPptx());
+
+        CliRun run = runCli(input.toString(), "--out", out.toString(), "--template", template.toString());
+        Map<String, byte[]> entries = ZipTestSupport.unzip(Files.readAllBytes(out));
+
+        assertEquals(0, run.exitCode);
+        assertTrue(run.err.contains("info: template-layout-selected:"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/slide1.xml").contains("Generated body"));
+        assertTrue(!ZipTestSupport.text(entries, "ppt/slides/slide1.xml").contains("Template-only body"));
     }
 
     private CliRun runCli(String... args) {

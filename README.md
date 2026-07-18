@@ -23,6 +23,8 @@ The initial Java version supports:
 - speaker notes using `<!-- speaker-notes: ... -->` HTML comments
 - simple Markdown tables as native PowerPoint table parts
 - conversion diagnostics for skipped images and HTML-like text warnings
+- `--template <pptx>` reuse of a template's slide size, theme, master, and first
+  title+body/content layout without copying existing template slides
 
 Known first-cut differences from the upstream TypeScript implementation are
 tracked in [docs/remaining-migration-items.md](docs/remaining-migration-items.md).
@@ -46,21 +48,38 @@ mvn package
 Convert a Markdown file:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.2.3.jar ./sample.md --out ./sample.pptx
+java -jar target/miku-md2pptx-java-0.6.0.jar ./sample.md --out ./sample.pptx
 ```
 
 Override the presentation title:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.2.3.jar ./sample.md --out ./sample.pptx --title "Project brief"
+java -jar target/miku-md2pptx-java-0.6.0.jar ./sample.md --out ./sample.pptx --title "Project brief"
+```
+
+Use a PowerPoint template:
+
+```bash
+java -jar target/miku-md2pptx-java-0.6.0.jar ./sample.md --out ./sample.pptx --template ./template.pptx
 ```
 
 Show help or version:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.2.3.jar --help
-java -jar target/miku-md2pptx-java-0.2.3.jar --version
+java -jar target/miku-md2pptx-java-0.6.0.jar --help
+java -jar target/miku-md2pptx-java-0.6.0.jar --version
 ```
+
+Relative CLI paths are resolved from the current working directory. Output
+parent directories are created automatically, and existing output files are
+replaced without prompting. Successful conversion prints `Wrote <path>` to
+stdout; diagnostics and fatal errors use stderr and nonzero exit codes.
+
+Template mode preserves design parts and uses the first layout with title and
+body/content placeholders. Existing template slides are not copied. If the
+template cannot be read, conversion fails; if no usable layout is found, the
+converter emits a warning and uses the built-in layout. Template positioning
+is structural rather than pixel-perfect.
 
 ## Development Notes
 

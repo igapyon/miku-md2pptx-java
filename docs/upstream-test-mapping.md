@@ -16,6 +16,8 @@ This file maps upstream test intent to Java tests.
 | Keep level 3-6 ATX headings as text blocks and strip closing heading markers | `MikuMd2pptxCoreTest.keepsDeeperHeadingsAsTextBlocksLikeUpstream` |
 | Use `Untitled slide` for blank level 1/2 headings | `MikuMd2pptxCoreTest.usesUntitledSlideForBlankHeadingLikeUpstream` |
 | Create a `.pptx` package with presentation and slide parts | `MikuMd2pptxCoreTest.createsPptxPackageWithPresentationAndSlideParts` |
+| Use valid OOXML `obj` layout type, preserve supplementary Unicode, and remove invalid XML characters | `MikuMd2pptxCoreTest.createsPptxPackageWithPresentationAndSlideParts`, `MikuMd2pptxCoreTest.preservesSupplementaryUnicodeAndRemovesInvalidXmlCharacters` |
+| Reuse a template title/body layout without copying existing template slides | `MikuMd2pptxCoreTest.usesTemplateLayoutWithoutCopyingTemplateSlides`, `MikuMd2pptxCliTest.writesPptxUsingTemplateWithoutCopyingTemplateSlides` |
 | Normalize tilde fenced code blocks, indented code blocks, and blank lines inside indented code blocks as code text | `MikuMd2pptxCoreTest.normalizesTildeFencedAndIndentedCodeBlocksLikeUpstream` |
 | Normalize GFM task list markers | `MikuMd2pptxCoreTest.normalizesGfmTaskListMarkersLikeUpstream` |
 | Skip Markdown definitions and normalize reference-style, shortcut reference link, and shortcut reference image nodes | `MikuMd2pptxCoreTest.ignoresDefinitionsAndNormalizesReferenceNodesLikeUpstream` |

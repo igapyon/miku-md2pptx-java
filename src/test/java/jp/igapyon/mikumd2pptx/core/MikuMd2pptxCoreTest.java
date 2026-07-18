@@ -1,6 +1,7 @@
 package jp.igapyon.mikumd2pptx.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -525,8 +526,42 @@ class MikuMd2pptxCoreTest {
 
         assertTrue(ZipTestSupport.text(entries, "[Content_Types].xml").contains("presentationml.presentation.main+xml"));
         assertTrue(ZipTestSupport.text(entries, "ppt/_rels/presentation.xml.rels").contains("slides/slide1.xml"));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slideLayouts/slideLayout1.xml").contains("type=\"obj\""));
+        assertFalse(ZipTestSupport.text(entries, "ppt/slideLayouts/slideLayout1.xml").contains("titleAndContent"));
         assertTrue(ZipTestSupport.text(entries, "ppt/slides/slide1.xml").contains("Deck"));
         assertTrue(ZipTestSupport.text(entries, "ppt/slides/slide2.xml").contains("Body"));
+    }
+
+    @Test
+    void preservesSupplementaryUnicodeAndRemovesInvalidXmlCharacters() throws Exception {
+        Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx("# Deck \uD83D\uDE00\n\nBody\u0001 text \uD800");
+        String slide = ZipTestSupport.text(ZipTestSupport.unzip(result.getPptx()), "ppt/slides/slide1.xml");
+
+        assertTrue(slide.contains("Deck \uD83D\uDE00"));
+        assertTrue(slide.contains("Body text "));
+        assertFalse(slide.contains("\u0001"));
+        assertFalse(slide.contains("\uFFFD"));
+    }
+
+    @Test
+    void usesTemplateLayoutWithoutCopyingTemplateSlides() throws Exception {
+        byte[] template = new MikuMd2pptxCore().convertMarkdownToPptx("# Template cover\n\nTemplate-only body").getPptx();
+        Md2PptxOptions options = new Md2PptxOptions();
+        options.setTemplatePptx(template);
+        Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx(
+                "# Generated deck\n\nGenerated body", options);
+        Map<String, byte[]> entries = ZipTestSupport.unzip(result.getPptx());
+        String slide = ZipTestSupport.text(entries, "ppt/slides/slide1.xml");
+
+        assertEquals("template-layout-selected", result.getDiagnostics().get(0).getCode());
+        assertEquals("info", result.getDiagnostics().get(0).getSeverity());
+        assertTrue(slide.contains("Generated deck"));
+        assertTrue(slide.contains("Generated body"));
+        assertFalse(slide.contains("Template-only body"));
+        assertFalse(slide.contains(" sz=\"2400\""));
+        assertFalse(slide.contains(" sz=\"1800\""));
+        assertTrue(ZipTestSupport.text(entries, "ppt/slides/_rels/slide1.xml.rels")
+                .contains("Target=\"../slideLayouts/slideLayout1.xml\""));
     }
 
     @Test

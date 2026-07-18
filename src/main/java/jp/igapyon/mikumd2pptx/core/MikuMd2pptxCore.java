@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MikuMd2pptxCore {
-    public static final String VERSION = "0.2.3";
+    public static final String VERSION = "0.6.0";
     public static final MikuMd2pptxMetadata METADATA = MikuMd2pptxMetadata.INSTANCE;
 
     public Md2PptxResult convertMarkdownToPptx(String markdown) {

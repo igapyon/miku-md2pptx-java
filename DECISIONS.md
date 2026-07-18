@@ -79,3 +79,17 @@ shape: build with Maven, validate `v*` tag compatibility with `pom.xml`, verify
 the jar under Java 8 using `--version`, and upload jar assets to the matching
 GitHub Release. Keep the local Maven assembly dist zip as a package output, not
 necessarily as a GitHub Release asset unless a later decision changes that.
+
+## 2026-07-18: Follow Upstream 0.6.0 as One Compatibility Unit
+
+Reason:
+Upstream template support depends on ZIP reading, template design-part copying,
+placeholder-aware slide generation, and the Office Core 0.6.0 XML/ZIP behavior.
+The later CLI contract and valid OOXML layout fix are part of the same upstream
+compatibility boundary.
+
+Impact:
+Track upstream commit `0fa0b5a2150793453690cead799a66a5e7960693` and version
+`0.6.0`. Port template behavior into the Java core and thin CLI adapter, update
+the vendored Office Core jar to `v0.6.0`, and keep existing template slides out
+of generated output.

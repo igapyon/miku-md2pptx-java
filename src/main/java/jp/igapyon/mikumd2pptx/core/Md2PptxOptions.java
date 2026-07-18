@@ -7,6 +7,7 @@ public class Md2PptxOptions {
 
     private String title;
     private String sourcePath;
+    private byte[] templatePptx;
     private ImageLoader imageLoader;
 
     public String getTitle() {
@@ -23,6 +24,14 @@ public class Md2PptxOptions {
 
     public void setSourcePath(String sourcePath) {
         this.sourcePath = sourcePath;
+    }
+
+    public byte[] getTemplatePptx() {
+        return templatePptx == null ? null : templatePptx.clone();
+    }
+
+    public void setTemplatePptx(byte[] templatePptx) {
+        this.templatePptx = templatePptx == null ? null : templatePptx.clone();
     }
 
     public ImageLoader getImageLoader() {

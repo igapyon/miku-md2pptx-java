@@ -20,8 +20,14 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - The active goal is now practical feature and behavior parity with the Node.js
   `miku-md2pptx` main application, including Java runtime/release readiness.
 - Initial creation of `miku-md2pptx-java` is implemented and committed.
-- Commit `c9076af` vendors `miku-ms-office-core-java` release `v0.5.1` and
-  replaces local ZIP/OPC helper classes with shared Office core helpers.
+- The vendored `miku-ms-office-core-java` dependency is updated to the official
+  `v0.6.0` release jar with its SHA-256 recorded in the vendor README.
+- The Java runtime now follows upstream `miku-md2pptx` `0.6.0` commit
+  `0fa0b5a2150793453690cead799a66a5e7960693`.
+- Core and CLI support `--template <pptx>` design-part reuse without copying
+  existing template slides. The built-in layout now uses valid OOXML type
+  `obj`, and the CLI execution contract follows current-working-directory path
+  resolution, overwrite, stdout/stderr, and exit-code behavior.
 - The repository has Maven runtime/CLI skeleton, Java core conversion, focused
   tests, README, miku-soft reference docs, upstream mapping docs, and AI state
   files.
@@ -138,15 +144,16 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Last Verification
 
-- `mvn test`: success on 2026-07-02, 51 tests passed after multiline setext
-  heading parity.
-- `mvn package`: success on 2026-06-28, 49 tests passed, jar, sources jar, and
-  dist zip created.
-- `java -jar target/miku-md2pptx-java-0.2.3.jar --version`: printed `0.2.3`.
-- `java -jar target/miku-md2pptx-java-0.2.3.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke`: success.
-- `jar tf target/smoke.pptx`: confirmed presentation, slide, notes, theme, and
-  relationship parts.
+- `mvn test`: success on 2026-07-18, 55 tests passed.
+- `mvn package`: success on 2026-07-18, jar, sources jar, and dist zip created.
+- `java -jar target/miku-md2pptx-java-0.6.0.jar --version`: printed `0.6.0`.
+- Packaged CLI template smoke generated `target/template-output.pptx`, emitted
+  `info: template-layout-selected`, retained the `obj` layout, and generated
+  only Markdown-derived slides.
+- Packaged CLI execution from `/tmp/miku-md2pptx-java-smoke.fAPobE` resolved
+  relative input/output paths from that working directory, created
+  `nested/out.pptx`, and printed `Wrote nested/out.pptx`.
 - `which libreoffice`, `which soffice`, and `ls -d /Applications/LibreOffice.app`:
   not available, so GUI repair-free opening verification remains external.
-- Current uncommitted edits include state-management files, README/docs updates,
-  and `.github/workflows/release-cli-runtime.yml`.
+- Current uncommitted edits are the upstream 0.6.0 Java follow-up implementation,
+  tests, vendored Office Core update, and synchronized docs/state files.

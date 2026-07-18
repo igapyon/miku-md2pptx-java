@@ -81,6 +81,13 @@
 - GitHub Release CLI runtime workflow is available for executable jar and
   sources jar assets on `v*` tags or manual dispatch.
 - Focused JUnit tests for core and CLI basics.
+- PowerPoint template design-part reuse through `--template`, without copying
+  existing template slides.
+- Valid OOXML `obj` slide layout generation with title/body placeholders.
+- Shared Office core `v0.6.0` XML sanitization that preserves supplementary
+  Unicode and removes invalid XML characters.
+- Current-working-directory CLI path resolution, documented overwrite behavior,
+  output parent creation, and aligned stdout/stderr/exit-code contract.
 
 ## Pending Compatibility Work
 

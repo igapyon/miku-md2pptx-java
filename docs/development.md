@@ -18,8 +18,8 @@ This repository is a single-module Maven Java runtime and CLI for
 ```bash
 mvn test
 mvn package
-java -jar target/miku-md2pptx-java-0.2.3.jar --version
-java -jar target/miku-md2pptx-java-0.2.3.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke
+java -jar target/miku-md2pptx-java-0.6.0.jar --version
+java -jar target/miku-md2pptx-java-0.6.0.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke
 jar tf target/smoke.pptx
 ```
 
@@ -30,7 +30,7 @@ and sister reference repositories. Git tracks only `workplace/.gitkeep`.
 
 ## Vendored Runtime Helper
 
-`vendor/miku-ms-office-core-java/` contains the shared Office core release jar
+`vendor/miku-ms-office-core-java/` contains the shared Office core `v0.6.0` release jar
 used for low-level ZIP / OPC / XML package helpers. PPTX document assembly,
 PowerPoint-specific templates, Markdown conversion semantics, and diagnostics
 remain in this repository.
@@ -66,7 +66,7 @@ downstream adapters.
 ## miku-soft Reference Check
 
 - Checked date: 2026-06-27
-- Latest upstream follow-up check: 2026-07-02
+- Latest upstream follow-up check: 2026-07-18
 - Main workflow: `references/30-java-straight-conversion-workflow.md`
 - Installed skill path:
   `/Users/igapyon/.codex/skills/igapyon-miku-soft-developer`

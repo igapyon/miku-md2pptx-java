@@ -98,7 +98,7 @@ Update this section while working. Do not rewrite unrelated TODO items.
   `docs/development.md`, including the distinction between GitHub Release jar
   assets and the local Maven assembly dist zip.
 - [x] Add or document a packaged CLI smoke check using
-  `java -jar target/miku-md2pptx-java-0.2.3.jar` on a representative Markdown
+  `java -jar target/miku-md2pptx-java-0.6.0.jar` on a representative Markdown
   fixture and verify the generated `.pptx` structure.
 - [x] Add a Java-side reverse compatibility test through
   local `../miku-pptx2md`, following the upstream Node compatibility test shape
@@ -110,6 +110,9 @@ Update this section while working. Do not rewrite unrelated TODO items.
 - [x] Attempt manual PowerPoint or LibreOffice repair-free opening checks on
   representative generated decks, or record the blocker if local GUI
   verification is unavailable.
+- [x] Follow upstream Node.js `miku-md2pptx` from `0.2.2` commit `5a8581a` to
+  `0.6.0` commit `0fa0b5a`, including template support, Office Core 0.6.0,
+  valid OOXML layout type, XML sanitization, and CLI execution contract.
 
 ### Blockers
 

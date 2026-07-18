@@ -3,6 +3,7 @@ package jp.igapyon.mikumd2pptx.cli;
 class CliOptions {
     String inputPath;
     String outPath;
+    String templatePath;
     String title;
     boolean help;
     boolean version;
@@ -21,6 +22,8 @@ class CliOptions {
                 options.outPath = requireValue(args, ++i, "--out");
             } else if ("--title".equals(arg)) {
                 options.title = requireValue(args, ++i, "--title");
+            } else if ("--template".equals(arg)) {
+                options.templatePath = requireValue(args, ++i, "--template");
             } else if (arg.startsWith("--")) {
                 throw new IllegalArgumentException("Unknown option: " + arg);
             } else if (options.inputPath == null) {

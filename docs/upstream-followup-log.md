@@ -20,3 +20,22 @@
 - Java already had executable runtime jar and sources jar release assets; added
   `MikuMd2pptxMetadata` and `MikuMd2pptxCore.METADATA` as the Java counterpart
   to the upstream runtime metadata.
+
+## 2026-07-18
+
+- Followed local upstream `miku-md2pptx` from
+  `5a8581aea680645b3ce62da7a07f6422051d9822` (`0.2.2`) to
+  `0fa0b5a2150793453690cead799a66a5e7960693` (`0.6.0`).
+- Added `--template <pptx>` and core `templatePptx` support. The Java runtime
+  reuses slide size, theme, master, layout, placeholder, and related design
+  parts, while excluding existing template slides from generated output.
+- Updated the built-in slide layout to valid OOXML type `obj` with title and
+  body placeholders.
+- Updated the vendored `miku-ms-office-core-java` runtime from `v0.5.1` to
+  `v0.6.0`, including supplementary-plane Unicode preservation and invalid XML
+  character sanitization.
+- Aligned relative path resolution, output parent creation, overwrite behavior,
+  stdout/stderr roles, exit-code wording, and agent-readable help with the
+  upstream CLI contract.
+- Added core and CLI regressions for template reuse, existing-slide exclusion,
+  valid layout type, and XML sanitization.

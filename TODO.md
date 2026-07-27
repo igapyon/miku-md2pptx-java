@@ -98,7 +98,7 @@ Update this section while working. Do not rewrite unrelated TODO items.
   `docs/development.md`, including the distinction between GitHub Release jar
   assets and the local Maven assembly dist zip.
 - [x] Add or document a packaged CLI smoke check using
-  `java -jar target/miku-md2pptx-java-0.6.0.jar` on a representative Markdown
+  `java -jar target/miku-md2pptx-java-0.7.0.jar` on a representative Markdown
   fixture and verify the generated `.pptx` structure.
 - [x] Add a Java-side reverse compatibility test through
   local `../miku-pptx2md`, following the upstream Node compatibility test shape
@@ -113,6 +113,16 @@ Update this section while working. Do not rewrite unrelated TODO items.
 - [x] Follow upstream Node.js `miku-md2pptx` from `0.2.2` commit `5a8581a` to
   `0.6.0` commit `0fa0b5a`, including template support, Office Core 0.6.0,
   valid OOXML layout type, XML sanitization, and CLI execution contract.
+- [x] Resolve GitHub Issue #7 by selecting ZIP DEFLATE for all generated PPTX
+  entries and covering both normal and template-based generation with focused
+  regression tests.
+- [x] Resolve the `miku-md2pptx-java` scope of GitHub Issue #6 by making
+  downloaded Release Asset commands primary in `--help`, documenting generated
+  artifacts, streams, and exit codes, and covering parent-directory creation,
+  overwrite, and failure exit behavior with focused tests.
+- [x] Follow upstream `miku-md2pptx` `v0.7.0` CLI behavior for short unknown
+  options, option-value validation, specific usage errors, machine-readable
+  output wording, and Java runtime version `0.7.0`.
 
 ### Blockers
 

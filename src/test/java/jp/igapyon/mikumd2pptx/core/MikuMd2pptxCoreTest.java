@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
 import org.junit.jupiter.api.Test;
 
 class MikuMd2pptxCoreTest {
@@ -533,6 +534,13 @@ class MikuMd2pptxCoreTest {
     }
 
     @Test
+    void writesDefaultPackageEntriesUsingDeflateCompression() throws Exception {
+        Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx("# Deck\n\nBody");
+
+        assertAllEntriesUseDeflate(result.getPptx());
+    }
+
+    @Test
     void preservesSupplementaryUnicodeAndRemovesInvalidXmlCharacters() throws Exception {
         Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx("# Deck \uD83D\uDE00\n\nBody\u0001 text \uD800");
         String slide = ZipTestSupport.text(ZipTestSupport.unzip(result.getPptx()), "ppt/slides/slide1.xml");
@@ -562,6 +570,19 @@ class MikuMd2pptxCoreTest {
         assertFalse(slide.contains(" sz=\"1800\""));
         assertTrue(ZipTestSupport.text(entries, "ppt/slides/_rels/slide1.xml.rels")
                 .contains("Target=\"../slideLayouts/slideLayout1.xml\""));
+    }
+
+    @Test
+    void writesTemplatePackageEntriesUsingDeflateCompression() throws Exception {
+        byte[] template = new MikuMd2pptxCore().convertMarkdownToPptx(
+                "# Template cover\n\nTemplate-only body").getPptx();
+        Md2PptxOptions options = new Md2PptxOptions();
+        options.setTemplatePptx(template);
+
+        Md2PptxResult result = new MikuMd2pptxCore().convertMarkdownToPptx(
+                "# Generated deck\n\nGenerated body", options);
+
+        assertAllEntriesUseDeflate(result.getPptx());
     }
 
     @Test
@@ -638,5 +659,13 @@ class MikuMd2pptxCoreTest {
         }
         input.close();
         return new String(output.toByteArray(), StandardCharsets.UTF_8);
+    }
+
+    private void assertAllEntriesUseDeflate(byte[] pptx) throws Exception {
+        Map<String, Integer> methods = ZipTestSupport.compressionMethods(pptx);
+        assertFalse(methods.isEmpty());
+        for (Map.Entry<String, Integer> entry : methods.entrySet()) {
+            assertEquals(ZipEntry.DEFLATED, entry.getValue().intValue(), entry.getKey());
+        }
     }
 }

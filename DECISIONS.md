@@ -93,3 +93,16 @@ Track upstream commit `0fa0b5a2150793453690cead799a66a5e7960693` and version
 `0.6.0`. Port template behavior into the Java core and thin CLI adapter, update
 the vendored Office Core jar to `v0.6.0`, and keep existing template slides out
 of generated output.
+
+## 2026-07-27: Follow Upstream 0.7.0 CLI Contract
+
+Reason:
+Upstream `miku-md2pptx` `v0.7.0` formalizes direct Release Asset commands,
+human-readable stdout, generated artifacts, exit codes, short unknown options,
+option-value validation, and DEFLATE output.
+
+Impact:
+Set the Java runtime version to `0.7.0`, align its CLI parser and help with that
+contract, and keep the product-side explicit DEFLATE selection. The vendored
+Office core remains `v0.6.0`; the upstream application version does not imply a
+new shared-core release.

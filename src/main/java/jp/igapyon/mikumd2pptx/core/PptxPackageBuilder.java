@@ -4,8 +4,10 @@ import jp.igapyon.mikumsofficecore.OpcContentTypeDefault;
 import jp.igapyon.mikumsofficecore.OpcContentTypeOverride;
 import jp.igapyon.mikumsofficecore.OpcContentTypes;
 import jp.igapyon.mikumsofficecore.OpcRelationship;
+import jp.igapyon.mikumsofficecore.ZipCompressionMethod;
 import jp.igapyon.mikumsofficecore.ZipEntryInput;
 import jp.igapyon.mikumsofficecore.ZipPackage;
+import jp.igapyon.mikumsofficecore.ZipWriteOptions;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -62,7 +64,8 @@ class PptxPackageBuilder {
         for (ZipEntryInput entry : mediaEntries) {
             addIfMissing(entries, entry);
         }
-        return ZipPackage.writeZipPackage(entries);
+        return ZipPackage.writeZipPackage(entries,
+                new ZipWriteOptions().setCompression(ZipCompressionMethod.DEFLATE));
     }
 
     private List<ZipEntryInput> defaultBaseEntries(List<SlideModel> slides, boolean hasNotes) {

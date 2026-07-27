@@ -36,11 +36,6 @@ public class MikuMd2pptxCli {
             out.println(MikuMd2pptxCore.VERSION);
             return 0;
         }
-        if (options.inputPath == null || options.outPath == null) {
-            err.print(helpText());
-            return 2;
-        }
-
         try {
             Path workingDirectory = Paths.get("").toAbsolutePath().normalize();
             Path inputPath = workingDirectory.resolve(options.inputPath).normalize();
@@ -83,12 +78,39 @@ public class MikuMd2pptxCli {
     }
 
     public static String helpText() {
+        String releaseJar = "miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar";
         return "miku-md2pptx converts a Markdown file into a PowerPoint .pptx deck.\n"
                 + "\n"
                 + "Usage:\n"
-                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar <input.md> --out <output.pptx> [--template <template.pptx>]\n"
-                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar --help\n"
-                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar --version\n"
+                + "  java -jar " + releaseJar + " <input.md> --out <output.pptx> [--template <template.pptx>]\n"
+                + "  java -jar " + releaseJar + " --help\n"
+                + "  java -jar " + releaseJar + " --version\n"
+                + "\n"
+                + "Inputs:\n"
+                + "  <input.md>              UTF-8 Markdown source file.\n"
+                + "  --template <path>       Optional PowerPoint .pptx design source.\n"
+                + "\n"
+                + "Outputs:\n"
+                + "  stdout                  Human-readable success status, help, or version.\n"
+                + "  stderr                  Usage errors, conversion diagnostics, and failures.\n"
+                + "  <output.pptx>           Primary generated PowerPoint file.\n"
+                + "\n"
+                + "Generated artifacts:\n"
+                + "  A conversion writes only the .pptx path supplied with --out. Maven target/\n"
+                + "  files are development artifacts, not conversion output.\n"
+                + "\n"
+                + "Overwrite behavior:\n"
+                + "  The output parent directory is created when needed. An existing output file\n"
+                + "  is replaced without prompting.\n"
+                + "\n"
+                + "Machine-readable output contract:\n"
+                + "  The generated .pptx file is the primary artifact. stdout is human-readable\n"
+                + "  status text and is not a stable machine-readable data format.\n"
+                + "\n"
+                + "Exit codes:\n"
+                + "  0  Conversion succeeded, or --help/--version was shown.\n"
+                + "  1  Input, output, template, or conversion processing failed.\n"
+                + "  2  CLI usage error, such as missing arguments or an unknown option.\n"
                 + "\n"
                 + "Options:\n"
                 + "  --out <path>             Output .pptx path.\n"
@@ -102,12 +124,9 @@ public class MikuMd2pptxCli {
                 + "Execution contract:\n"
                 + "  Input, output, template, and local image paths are processed locally. Relative\n"
                 + "  CLI paths are resolved from the current working directory.\n"
-                + "  The output parent directory is created when needed. An existing output file\n"
-                + "  is replaced without prompting.\n"
                 + "  On success, the command exits 0 and prints \"Wrote <path>\" to stdout.\n"
                 + "  Conversion diagnostics use \"<severity>: <code>: <message>\" on stderr. A\n"
-                + "  warning does not by itself make the command fail. Fatal errors use stderr and\n"
-                + "  a nonzero exit code.\n"
+                + "  warning does not by itself make the command fail.\n"
                 + "\n"
                 + "Template behavior:\n"
                 + "  --template reads slide size, theme, slide masters, slide layouts, and related\n"
@@ -135,9 +154,9 @@ public class MikuMd2pptxCli {
                 + "  pixel-perfect PowerPoint layout.\n"
                 + "\n"
                 + "Examples:\n"
-                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar sample.md --out sample.pptx\n"
-                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar sample.md --out sample.pptx --template template.pptx\n"
-                + "  java -jar target/miku-md2pptx-java-" + MikuMd2pptxCore.VERSION + ".jar sample.md --out sample.pptx --title \"Project brief\"\n";
+                + "  java -jar " + releaseJar + " sample.md --out sample.pptx\n"
+                + "  java -jar " + releaseJar + " sample.md --out sample.pptx --template template.pptx\n"
+                + "  java -jar " + releaseJar + " sample.md --out sample.pptx --title \"Project brief\"\n";
     }
 
     private Md2PptxOptions.ImageLoader createImageLoader(final Path inputPath) {

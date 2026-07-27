@@ -18,8 +18,8 @@ This repository is a single-module Maven Java runtime and CLI for
 ```bash
 mvn test
 mvn package
-java -jar target/miku-md2pptx-java-0.6.0.jar --version
-java -jar target/miku-md2pptx-java-0.6.0.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke
+java -jar target/miku-md2pptx-java-0.7.0.jar --version
+java -jar target/miku-md2pptx-java-0.7.0.jar src/test/resources/fixtures/smoke.md --out target/smoke.pptx --title Smoke
 jar tf target/smoke.pptx
 ```
 
@@ -66,7 +66,7 @@ downstream adapters.
 ## miku-soft Reference Check
 
 - Checked date: 2026-06-27
-- Latest upstream follow-up check: 2026-07-18
+- Latest upstream follow-up check: 2026-07-27
 - Main workflow: `references/30-java-straight-conversion-workflow.md`
 - Installed skill path:
   `/Users/igapyon/.codex/skills/igapyon-miku-soft-developer`

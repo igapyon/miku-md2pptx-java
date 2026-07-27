@@ -39,3 +39,16 @@
   upstream CLI contract.
 - Added core and CLI regressions for template reuse, existing-slide exclusion,
   valid layout type, and XML sanitization.
+
+## 2026-07-27
+
+- Followed local and remote upstream `miku-md2pptx` from
+  `0fa0b5a2150793453690cead799a66a5e7960693` (`0.6.0`) to
+  `dd59e38c2b608e2e521aa4b941b8ab05543b9716` (`0.7.0`).
+- Aligned the Java Release Asset help with the upstream input/output,
+  generated-artifact, overwrite, machine-readable-output, and exit-code
+  contract.
+- Aligned short unknown-option handling and rejected option tokens used in
+  place of `--out`, `--template`, or `--title` values.
+- Followed the upstream DEFLATE behavior while retaining the shared Office core
+  dependency at `v0.6.0`.

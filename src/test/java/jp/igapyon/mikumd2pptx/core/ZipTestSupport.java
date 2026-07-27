@@ -31,4 +31,16 @@ public class ZipTestSupport {
         byte[] bytes = entries.get(path);
         return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
     }
+
+    public static Map<String, Integer> compressionMethods(byte[] zipBytes) throws IOException {
+        Map<String, Integer> methods = new HashMap<String, Integer>();
+        ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(zipBytes));
+        ZipEntry entry;
+        while ((entry = zip.getNextEntry()) != null) {
+            methods.put(entry.getName(), Integer.valueOf(entry.getMethod()));
+            zip.closeEntry();
+        }
+        zip.close();
+        return methods;
+    }
 }

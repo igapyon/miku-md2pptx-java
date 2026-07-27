@@ -7,6 +7,8 @@ It converts Markdown files into editable PowerPoint `.pptx` decks using a local
 Java runtime. Files are processed on your machine and are not uploaded to a
 server.
 
+Generated PPTX package entries use ZIP DEFLATE compression.
+
 This repository follows the miku-soft Java straight-conversion style. The Java
 version preserves the upstream product boundary where practical, while exposing
 a Maven-built executable jar and a small public Java core API.
@@ -45,35 +47,44 @@ Package the executable jar:
 mvn package
 ```
 
-Convert a Markdown file:
+After downloading the GitHub Release asset, convert a Markdown file directly
+from the directory containing the jar:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.6.0.jar ./sample.md --out ./sample.pptx
+java -jar miku-md2pptx-java-0.7.0.jar ./sample.md --out ./sample.pptx
 ```
 
 Override the presentation title:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.6.0.jar ./sample.md --out ./sample.pptx --title "Project brief"
+java -jar miku-md2pptx-java-0.7.0.jar ./sample.md --out ./sample.pptx --title "Project brief"
 ```
 
 Use a PowerPoint template:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.6.0.jar ./sample.md --out ./sample.pptx --template ./template.pptx
+java -jar miku-md2pptx-java-0.7.0.jar ./sample.md --out ./sample.pptx --template ./template.pptx
 ```
 
 Show help or version:
 
 ```bash
-java -jar target/miku-md2pptx-java-0.6.0.jar --help
-java -jar target/miku-md2pptx-java-0.6.0.jar --version
+java -jar miku-md2pptx-java-0.7.0.jar --help
+java -jar miku-md2pptx-java-0.7.0.jar --version
 ```
 
 Relative CLI paths are resolved from the current working directory. Output
 parent directories are created automatically, and existing output files are
 replaced without prompting. Successful conversion prints `Wrote <path>` to
-stdout; diagnostics and fatal errors use stderr and nonzero exit codes.
+stdout; help and version text also use stdout. Usage errors, diagnostics,
+warnings, and fatal errors use stderr. Exit code `0` means success, help, or
+version; `1` means an input/output/template/conversion failure; and `2` means a
+CLI usage error. A normal conversion generates only the `.pptx` selected by
+`--out`. stdout is human-readable status text, not a stable machine-readable
+data format.
+
+For a locally built checkout, prepend `target/` to the jar filename in these
+commands.
 
 Template mode preserves design parts and uses the first layout with title and
 body/content placeholders. Existing template slides are not copied. If the

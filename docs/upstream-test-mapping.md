@@ -16,6 +16,7 @@ This file maps upstream test intent to Java tests.
 | Keep level 3-6 ATX headings as text blocks and strip closing heading markers | `MikuMd2pptxCoreTest.keepsDeeperHeadingsAsTextBlocksLikeUpstream` |
 | Use `Untitled slide` for blank level 1/2 headings | `MikuMd2pptxCoreTest.usesUntitledSlideForBlankHeadingLikeUpstream` |
 | Create a `.pptx` package with presentation and slide parts | `MikuMd2pptxCoreTest.createsPptxPackageWithPresentationAndSlideParts` |
+| Write every normal and template-based PPTX ZIP entry with DEFLATE compression | `MikuMd2pptxCoreTest.writesDefaultPackageEntriesUsingDeflateCompression`, `MikuMd2pptxCoreTest.writesTemplatePackageEntriesUsingDeflateCompression` |
 | Use valid OOXML `obj` layout type, preserve supplementary Unicode, and remove invalid XML characters | `MikuMd2pptxCoreTest.createsPptxPackageWithPresentationAndSlideParts`, `MikuMd2pptxCoreTest.preservesSupplementaryUnicodeAndRemovesInvalidXmlCharacters` |
 | Reuse a template title/body layout without copying existing template slides | `MikuMd2pptxCoreTest.usesTemplateLayoutWithoutCopyingTemplateSlides`, `MikuMd2pptxCliTest.writesPptxUsingTemplateWithoutCopyingTemplateSlides` |
 | Normalize tilde fenced code blocks, indented code blocks, and blank lines inside indented code blocks as code text | `MikuMd2pptxCoreTest.normalizesTildeFencedAndIndentedCodeBlocksLikeUpstream` |
@@ -48,9 +49,14 @@ This file maps upstream test intent to Java tests.
 | Print CLI version | `MikuMd2pptxCliTest.printsVersion` |
 | Print CLI help | `MikuMd2pptxCliTest.printsAgentReadableHelp` |
 | Write `.pptx` through CLI | `MikuMd2pptxCliTest.writesPptxFile` |
+| Create output parent directories and replace an existing output file | `MikuMd2pptxCliTest.createsOutputParentDirectoriesAndReplacesExistingFile` |
 | Reject unknown option with code 2 | `MikuMd2pptxCliTest.rejectsUnknownOption` |
+| Reject unknown short option with code 2 | `MikuMd2pptxCliTest.rejectsUnknownShortOption` |
+| Reject an empty command line with code 2 | `MikuMd2pptxCliTest.rejectsNoArgumentsAsUsageError` |
 | Reject unexpected positional argument | `MikuMd2pptxCliTest.rejectsUnexpectedArgument` |
 | Reject missing required CLI values | `MikuMd2pptxCliTest.rejectsMissingOutArgument`, `MikuMd2pptxCliTest.rejectsMissingInputArgument`, `MikuMd2pptxCliTest.rejectsMissingValueForOptions` |
+| Reject option tokens used as output, template, or title values | `MikuMd2pptxCliTest.rejectsOptionTokenAsOutValue`, `MikuMd2pptxCliTest.rejectsOptionTokenAsTemplateValue`, `MikuMd2pptxCliTest.rejectsOptionTokenAsTitleValue` |
+| Report a missing input file as a processing failure with code 1 | `MikuMd2pptxCliTest.reportsMissingInputFileAsProcessingFailure` |
 | Print conversion diagnostics to stderr | `MikuMd2pptxCliTest.printsConversionDiagnosticsToStderr` |
 | Round-trip a representative Java-generated deck through local `miku-pptx2md` when available | `MikuPptx2mdCompatibilityTest.roundTripsRepresentativeDeckThroughLocalMikuPptx2mdWhenAvailable` |
 

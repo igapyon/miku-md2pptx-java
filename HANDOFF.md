@@ -22,8 +22,8 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - Initial creation of `miku-md2pptx-java` is implemented and committed.
 - The vendored `miku-ms-office-core-java` dependency is updated to the official
   `v0.6.0` release jar with its SHA-256 recorded in the vendor README.
-- The Java runtime now follows upstream `miku-md2pptx` `0.6.0` commit
-  `0fa0b5a2150793453690cead799a66a5e7960693`.
+- The Java runtime now follows upstream `miku-md2pptx` `0.7.0` commit
+  `dd59e38c2b608e2e521aa4b941b8ab05543b9716`.
 - Core and CLI support `--template <pptx>` design-part reuse without copying
   existing template slides. The built-in layout now uses valid OOXML type
   `obj`, and the CLI execution contract follows current-working-directory path
@@ -94,6 +94,17 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
   required values/arguments.
 - Java `--help` wording now matches the upstream Node CLI text, except for
   Java jar command examples.
+- GitHub Issue #7 is implemented: generated PPTX entries explicitly use ZIP
+  DEFLATE in both normal and template-based conversion, with focused regression
+  tests for every entry.
+- The `miku-md2pptx-java` portion of GitHub Issue #6 is implemented: `--help`
+  uses downloaded Release Asset commands without a source-tree `target/`
+  prefix, explicitly documents generated artifacts, stdout/stderr, and exit
+  codes, and tests parent-directory creation, overwrite, and processing
+  failures.
+- The Java `0.7.0` CLI now follows the upstream short unknown-option and
+  option-value validation behavior, reports specific usage errors with exit
+  code `2`, and states that stdout is not a stable machine-readable format.
 - Runtime release workflow, packaged CLI smoke documentation, and optional
   Java-side reverse compatibility smoke through local `../miku-pptx2md` are now
   added. The remaining runtime-adjacent task is manual PowerPoint/LibreOffice
@@ -144,9 +155,15 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Last Verification
 
-- `mvn test`: success on 2026-07-18, 55 tests passed.
-- `mvn package`: success on 2026-07-18, jar, sources jar, and dist zip created.
-- `java -jar target/miku-md2pptx-java-0.6.0.jar --version`: printed `0.6.0`.
+- `mvn test`: success on 2026-07-27, 64 tests passed.
+- `mvn package`: success on 2026-07-27, jar, sources jar, and dist zip created.
+- Packaged CLI normal and template smoke conversions succeeded on 2026-07-27.
+  `unzip -lv` reported all 23 entries as DEFLATE in the normal output, and all
+  23 entries as DEFLATE in the template-based output.
+- `java -jar target/miku-md2pptx-java-0.7.0.jar --version`: printed `0.7.0`.
+- Packaged CLI process checks confirmed exit code `2` for `-x`, missing
+  arguments, and option tokens supplied as output/template/title values; a
+  missing input file remained a processing failure with exit code `1`.
 - Packaged CLI template smoke generated `target/template-output.pptx`, emitted
   `info: template-layout-selected`, retained the `obj` layout, and generated
   only Markdown-derived slides.
@@ -155,5 +172,6 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
   `nested/out.pptx`, and printed `Wrote nested/out.pptx`.
 - `which libreoffice`, `which soffice`, and `ls -d /Applications/LibreOffice.app`:
   not available, so GUI repair-free opening verification remains external.
-- Current uncommitted edits are the upstream 0.6.0 Java follow-up implementation,
-  tests, vendored Office Core update, and synchronized docs/state files.
+- Current uncommitted edits are the upstream `0.7.0` Java follow-up
+  implementation, Issue #6/#7 tests, explicit DEFLATE selection, and
+  synchronized docs/state files.
